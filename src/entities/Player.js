@@ -60,9 +60,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.bullets) return;
 
     const offsetX = this.facing === 1 ? this.width * 0.6 : -this.width * 0.6;
-    const bullet = this.bullets.get(this.x + offsetX, this.y - this.height * 0.15, 'bullet');
+    const spawnX = this.x + offsetX;
+    const spawnY = this.y - this.height * 0.15;
+    const bullet = this.bullets.get(spawnX, spawnY, 'bullet');
     if (!bullet) return;
 
+    // Al reutilizar una bala del pool hay que sincronizar tambien su cuerpo
+    // fisico; setActive/setVisible no eliminan su posicion anterior.
+    bullet.body.reset(spawnX, spawnY);
     bullet.setActive(true).setVisible(true);
     bullet.body.enable = true;
     bullet.body.allowGravity = false;

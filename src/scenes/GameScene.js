@@ -10,6 +10,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.isRestarting = false;
     this.physics.world.setBounds(0, 0, LEVEL_WIDTH, GAME_HEIGHT);
 
     this.drawBackground();
@@ -46,8 +47,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time) {
+    if (this.isRestarting) return;
+
     this.player.update(time);
-    this.enemies.getChildren().forEach((enemy) => enemy.update());
+    this.enemies.getChildren().forEach((enemy) => {
+      if (enemy.active) enemy.update();
+    });
 
     this.bullets.getChildren().forEach((bullet) => {
       if (bullet.active && (bullet.x < 0 || bullet.x > LEVEL_WIDTH)) {
@@ -88,6 +93,10 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onBulletHitsEnemy(bullet, enemy) {
+    // Una bala puede solaparse con varios cuerpos durante el mismo paso de
+    // fisicas. Solo el primer impacto debe causar dano y dar puntos.
+    if (!bullet.active || !enemy.active) return;
+
     this.deactivateBullet(bullet);
     const died = enemy.takeDamage(BULLET_DAMAGE);
     if (died) {
@@ -97,14 +106,21 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onPlayerTouchesEnemy(enemy) {
+    if (this.isRestarting || !enemy.active) return;
+
     const died = this.player.takeDamage(PLAYER_TOUCH_DAMAGE, this.time.now);
     this.updateHUD();
     if (died) {
-      this.scene.restart();
+      this.isRestarting = true;
+      this.physics.pause();
+      this.time.delayedCall(150, () => this.scene.restart());
     }
   }
 
   deactivateBullet(bullet) {
+    if (!bullet?.active) return;
+
+    bullet.setVelocity(0, 0);
     bullet.setActive(false).setVisible(false);
     bullet.body.enable = false;
   }

@@ -30,9 +30,11 @@ export function buildLevel(scene) {
 
   const enemySpawns = [
     { x: 500, y: groundY - 60, minX: 420, maxX: 620, speed: 60 },
-    { x: 750, y: 300, minX: 700, maxX: 880, speed: 50 },
-    { x: 1180, y: 400, minX: 1100, maxX: 1330, speed: 70 },
-    { x: 1550, y: 280, minX: 1500, maxX: 1660, speed: 50 },
+    // Los limites dejan medio enemigo de margen para que no abandone la
+    // plataforma antes de poder cambiar de direccion.
+    { x: 750, y: 300, minX: 684, maxX: 844, speed: 50 },
+    { x: 1180, y: 400, minX: 1084, maxX: 1308, speed: 70 },
+    { x: 1550, y: 280, minX: 1484, maxX: 1644, speed: 50 },
     { x: 2000, y: groundY - 60, minX: 1900, maxX: 2150, speed: 80 }
   ];
 

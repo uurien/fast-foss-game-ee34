@@ -17,9 +17,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    if (this.x <= this.patrolMinX) {
+    if (!this.active || !this.body) return;
+
+    if (this.x <= this.patrolMinX || this.body.blocked.left) {
+      this.x = Math.max(this.x, this.patrolMinX);
       this.direction = 1;
-    } else if (this.x >= this.patrolMaxX) {
+    } else if (this.x >= this.patrolMaxX || this.body.blocked.right) {
+      this.x = Math.min(this.x, this.patrolMaxX);
       this.direction = -1;
     }
 
