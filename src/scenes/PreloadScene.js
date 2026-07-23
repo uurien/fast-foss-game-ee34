@@ -6,14 +6,53 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    // Cuando haya arte real, cargarlo aqui, por ejemplo:
-    // this.load.spritesheet('begitxo', 'assets/begitxo.png', { frameWidth: 32, frameHeight: 48 });
-    // this.load.image('platform', 'assets/platform.png');
+    this.load.image('begitxo-source', 'assets/begitxo-summer-v4-clean.png');
   }
 
   create() {
+    this.createBegitxoSpritesheet();
     this.generatePlaceholderTextures();
     this.scene.start('Game');
+  }
+
+  createBegitxoSpritesheet() {
+    const source = this.textures.get('begitxo-source').getSourceImage();
+    const texture = this.textures.createCanvas('player', source.width, source.height);
+    const context = texture.context;
+    const frameWidth = source.width / 3;
+    const frameHeight = source.height / 2;
+
+    // Los dos dibujos de carrera no comparten centro ni linea de suelo en
+    // el arte original. Los realineamos dentro de sus celdas para evitar
+    // que Begitxo tiemble hacia los lados al alternarlos.
+    const frameOffsets = [
+      { x: 0, y: 0 },
+      { x: 18, y: -14 },
+      { x: 78, y: 0 },
+      { x: -17, y: 36 },
+      { x: 0, y: 0 },
+      { x: 0, y: 0 }
+    ];
+    frameOffsets.forEach((offset, frame) => {
+      const sourceX = (frame % 3) * frameWidth;
+      const sourceY = Math.floor(frame / 3) * frameHeight;
+      context.drawImage(
+        source,
+        sourceX,
+        sourceY,
+        frameWidth,
+        frameHeight,
+        sourceX + offset.x,
+        sourceY + offset.y,
+        frameWidth,
+        frameHeight
+      );
+    });
+
+    for (let frame = 0; frame < 6; frame += 1) {
+      texture.add(frame, 0, (frame % 3) * frameWidth, Math.floor(frame / 3) * frameHeight, frameWidth, frameHeight);
+    }
+    texture.refresh();
   }
 
   // Genera texturas de un solo color para poder jugar y probar la logica
@@ -21,11 +60,6 @@ export default class PreloadScene extends Phaser.Scene {
   // load.spritesheet cuando llegue el arte final.
   generatePlaceholderTextures() {
     const g = this.add.graphics();
-
-    g.fillStyle(0x3498db, 1);
-    g.fillRect(0, 0, 28, 48);
-    g.generateTexture('player', 28, 48);
-    g.clear();
 
     g.fillStyle(0xe74c3c, 1);
     g.fillRect(0, 0, 32, 32);

@@ -10,13 +10,15 @@ import {
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, bulletGroup) {
-    super(scene, x, y, 'player');
+    super(scene, x, y, 'player', 0);
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    this.setScale(0.22);
     this.setCollideWorldBounds(true);
     this.setBounce(0.05);
-    this.body.setSize(this.width - 6, this.height - 2);
+    this.body.setSize(190, 390);
+    this.body.setOffset(161, 88);
 
     this.bullets = bulletGroup;
     this.health = PLAYER_MAX_HEALTH;
@@ -26,6 +28,37 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.cursors = scene.input.keyboard.createCursorKeys();
     this.keys = scene.input.keyboard.addKeys('W,A,S,D,SPACE,X');
+
+    this.createAnimations();
+  }
+
+  createAnimations() {
+    if (!this.scene.anims.exists('begitxo-idle')) {
+      this.scene.anims.create({
+        key: 'begitxo-idle',
+        frames: [{ key: 'player', frame: 0 }],
+        frameRate: 1,
+        repeat: -1
+      });
+      this.scene.anims.create({
+        key: 'begitxo-run',
+        frames: [
+          { key: 'player', frame: 2 },
+          { key: 'player', frame: 1 },
+          { key: 'player', frame: 3 },
+          { key: 'player', frame: 1 }
+        ],
+        frameRate: 10,
+        repeat: -1
+      });
+      this.scene.anims.create({
+        key: 'begitxo-jump',
+        frames: [{ key: 'player', frame: 4 }],
+        frameRate: 1
+      });
+    }
+
+    this.play('begitxo-idle');
   }
 
   update(time) {
@@ -54,14 +87,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.shoot();
       this.nextShotAt = time + FIRE_COOLDOWN_MS;
     }
+
+    if (!this.body.blocked.down) {
+      this.play('begitxo-jump', true);
+    } else if (left || right) {
+      this.play('begitxo-run', true);
+    } else {
+      this.play('begitxo-idle', true);
+    }
   }
 
   shoot() {
     if (!this.bullets) return;
 
-    const offsetX = this.facing === 1 ? this.width * 0.6 : -this.width * 0.6;
+    const offsetX = this.facing === 1 ? this.displayWidth * 0.35 : -this.displayWidth * 0.35;
     const spawnX = this.x + offsetX;
-    const spawnY = this.y - this.height * 0.15;
+    const spawnY = this.y - this.displayHeight * 0.1;
     const bullet = this.bullets.get(spawnX, spawnY, 'bullet');
     if (!bullet) return;
 
