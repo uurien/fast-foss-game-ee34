@@ -4,7 +4,8 @@ import {
   JUMP_VELOCITY,
   PLAYER_MAX_HEALTH,
   PLAYER_INVULNERABLE_MS,
-  BULLET_SPEED,
+  WATER_GUN_SPEED_X,
+  WATER_GUN_LAUNCH_VY,
   FIRE_COOLDOWN_MS
 } from '../config.js';
 
@@ -25,6 +26,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.facing = 1;
     this.invulnerableUntil = 0;
     this.nextShotAt = 0;
+    // Multiplicador de velocidad; las zonas de calor lo bajan mientras se
+    // pisan (ver GameScene.updateHeatZones). Se recalcula cada frame, no hace
+    // falta restaurarlo aqui salvo el valor inicial.
+    this.speedMultiplier = 1;
 
     this.cursors = scene.input.keyboard.createCursorKeys();
     this.keys = scene.input.keyboard.addKeys('W,A,S,D,SPACE,X');
@@ -67,12 +72,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     const jump = this.cursors.up.isDown || this.keys.W.isDown || this.keys.SPACE.isDown;
     const shoot = this.keys.X.isDown || this.scene.input.activePointer.isDown;
 
+    const speed = PLAYER_SPEED * this.speedMultiplier;
+
     if (left) {
-      this.setVelocityX(-PLAYER_SPEED);
+      this.setVelocityX(-speed);
       this.facing = -1;
       this.setFlipX(true);
     } else if (right) {
-      this.setVelocityX(PLAYER_SPEED);
+      this.setVelocityX(speed);
       this.facing = 1;
       this.setFlipX(false);
     } else {
@@ -111,9 +118,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     bullet.body.reset(spawnX, spawnY);
     bullet.setActive(true).setVisible(true);
     bullet.body.enable = true;
-    bullet.body.allowGravity = false;
-    bullet.setVelocity(this.facing * BULLET_SPEED, 0);
+    // El chorro de agua cae en parabola: se deja que la gravedad del mundo
+    // actue sobre el en vez de volar en linea recta como las balas.
+    bullet.body.allowGravity = true;
+    bullet.setVelocity(this.facing * WATER_GUN_SPEED_X, WATER_GUN_LAUNCH_VY);
     bullet.setFlipX(this.facing === -1);
+    // El chorro de la pistola de agua tiene alcance limitado; se recuerda el
+    // origen para poder desactivarla al superar ese alcance (ver GameScene).
+    bullet.spawnX = spawnX;
   }
 
   takeDamage(amount, time) {

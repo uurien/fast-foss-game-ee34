@@ -1,8 +1,17 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player.js';
-import Enemy from '../entities/Enemy.js';
+import HeatWave from '../entities/HeatWave.js';
 import { buildLevel } from '../entities/Platforms.js';
-import { GAME_HEIGHT, LEVEL_WIDTH, PLAYER_TOUCH_DAMAGE, BULLET_DAMAGE } from '../config.js';
+import {
+  GAME_HEIGHT,
+  LEVEL_WIDTH,
+  PLAYER_TOUCH_DAMAGE,
+  BULLET_DAMAGE,
+  WATER_GUN_RANGE,
+  HEAT_ZONE_SLOW_FACTOR,
+  HEAT_ZONE_DAMAGE_PER_TICK,
+  HEAT_ZONE_TICK_MS
+} from '../config.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -15,7 +24,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.drawBackground();
 
-    const { platforms, enemySpawns } = buildLevel(this);
+    const { platforms, enemySpawns, heatZones } = buildLevel(this);
     this.platforms = platforms;
 
     this.bullets = this.physics.add.group({
@@ -25,12 +34,41 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.player = new Player(this, 100, GAME_HEIGHT - 150, this.bullets);
+    this.player.setDepth(2);
 
     this.enemies = this.physics.add.group();
     enemySpawns.forEach((spawn) => {
-      const enemy = new Enemy(this, spawn.x, spawn.y, spawn.minX, spawn.maxX, spawn.speed);
+      const enemy = new HeatWave(
+        this,
+        spawn.x,
+        spawn.y,
+        spawn.minX,
+        spawn.maxX,
+        spawn.speed
+      );
+      enemy.setDepth(2);
       this.enemies.add(enemy);
     });
+
+    this.heatZoneRects = heatZones.map(
+      (zone) => new Phaser.Geom.Rectangle(zone.x - zone.width / 2, zone.y - zone.height / 2, zone.width, zone.height)
+    );
+    heatZones.forEach((zone) => {
+      // Una variante por baldosa evita que los tres tramos repitan el mismo
+      // dibujo. Comparten centro y tamano con las tablas del suelo, de modo
+      // que actuan como decal por encima de la madera.
+      const startX = zone.x - zone.width / 2;
+      for (let offset = 0; offset < zone.width; offset += 64) {
+        const variant = (offset / 64) % 3;
+        // El decal es ligeramente mas alto que la baldosa y se desplaza dos
+        // pixeles hacia abajo para ajustar visualmente su linea de suelo.
+        this.add
+          .image(startX + offset + 32, zone.y + 2, `heat-zone-${variant + 1}`)
+          .setDisplaySize(64, 36)
+          .setDepth(1);
+      }
+    });
+    this.nextHeatZoneDamageAt = 0;
 
     this.physics.add.collider(this.player, this.platforms);
     this.physics.add.collider(this.enemies, this.platforms);
@@ -49,16 +87,34 @@ export default class GameScene extends Phaser.Scene {
   update(time) {
     if (this.isRestarting) return;
 
+    this.updateHeatZones(time);
     this.player.update(time);
     this.enemies.getChildren().forEach((enemy) => {
-      if (enemy.active) enemy.update();
+      if (enemy.active) enemy.update(time);
     });
 
     this.bullets.getChildren().forEach((bullet) => {
-      if (bullet.active && (bullet.x < 0 || bullet.x > LEVEL_WIDTH)) {
+      const outOfRange = Math.abs(bullet.x - bullet.spawnX) > WATER_GUN_RANGE;
+      if (bullet.active && (bullet.x < 0 || bullet.x > LEVEL_WIDTH || outOfRange)) {
         this.deactivateBullet(bullet);
       }
     });
+  }
+
+  updateHeatZones(time) {
+    // getBounds() incluye toda la celda visual del spritesheet, con bastante
+    // espacio transparente alrededor de Begitxo. El cuerpo Arcade refleja la
+    // zona fisica real y evita recibir dano antes de tocar el suelo caliente.
+    const body = this.player.body;
+    const bounds = new Phaser.Geom.Rectangle(body.x, body.y, body.width, body.height);
+    const inZone = this.heatZoneRects.some((zone) => Phaser.Geom.Intersects.RectangleToRectangle(bounds, zone));
+
+    this.player.speedMultiplier = inZone ? HEAT_ZONE_SLOW_FACTOR : 1;
+
+    if (inZone && time >= this.nextHeatZoneDamageAt) {
+      this.nextHeatZoneDamageAt = time + HEAT_ZONE_TICK_MS;
+      this.damagePlayer(HEAT_ZONE_DAMAGE_PER_TICK, time);
+    }
   }
 
   drawBackground() {
@@ -108,13 +164,21 @@ export default class GameScene extends Phaser.Scene {
   onPlayerTouchesEnemy(enemy) {
     if (this.isRestarting || !enemy.active) return;
 
-    const died = this.player.takeDamage(PLAYER_TOUCH_DAMAGE, this.time.now);
+    this.damagePlayer(PLAYER_TOUCH_DAMAGE, this.time.now);
+  }
+
+  // Punto unico de dano al jugador: aplica la vida, refresca el HUD y
+  // arranca el reinicio si muere. Lo usan tanto el contacto con enemigos
+  // como los proyectiles de calor y las zonas de calor.
+  damagePlayer(amount, time) {
+    const died = this.player.takeDamage(amount, time);
     this.updateHUD();
     if (died) {
       this.isRestarting = true;
       this.physics.pause();
       this.time.delayedCall(150, () => this.scene.restart());
     }
+    return died;
   }
 
   deactivateBullet(bullet) {

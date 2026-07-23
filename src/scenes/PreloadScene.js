@@ -7,6 +7,10 @@ export default class PreloadScene extends Phaser.Scene {
 
   preload() {
     this.load.image('begitxo-source', 'assets/begitxo-summer-v4-clean.png');
+    this.load.image('heat-zone-1', 'assets/heat-zone-1.png');
+    this.load.image('heat-zone-2', 'assets/heat-zone-2.png');
+    this.load.image('heat-zone-3', 'assets/heat-zone-3.png');
+    this.load.image('heatwave', 'assets/heatwave.png');
   }
 
   create() {
@@ -62,11 +66,12 @@ export default class PreloadScene extends Phaser.Scene {
     const g = this.add.graphics();
 
     g.fillStyle(0xe74c3c, 1);
-    g.fillRect(0, 0, 32, 32);
-    g.generateTexture('enemy', 32, 32);
+    g.fillRect(0, 0, 64, 64);
+    g.generateTexture('enemy', 64, 64);
     g.clear();
 
-    g.fillStyle(0xf1c40f, 1);
+    // Chorro de la pistola de agua: el mismo palito de antes, pero azul.
+    g.fillStyle(0x1976d2, 1);
     g.fillRect(0, 0, 12, 6);
     g.generateTexture('bullet', 12, 6);
     g.clear();
