@@ -80,7 +80,9 @@ export function buildLevel(scene) {
   ];
 
   // Objetivo del nivel: la heladeria, al final de la recta despejada.
-  const goal = { x: LEVEL_WIDTH - 160, y: groundY - 100 };
+  // Objetivo al final del nivel. La imagen mide 200 px de alto y queda
+  // apoyada sobre el borde superior de las baldosas.
+  const goal = { x: LEVEL_WIDTH - 160, y: groundY - TILE_H / 2 - 100 };
 
   return { platforms, enemySpawns, heatZones, goal };
 }

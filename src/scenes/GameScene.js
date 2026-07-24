@@ -193,6 +193,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.isRestarting || this.hasWon) return;
 
     this.hasWon = true;
+    this.player.setVelocity(0, 0);
+    this.player.play('begitxo-idle', true);
     this.physics.pause();
 
     this.add
