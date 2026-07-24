@@ -11,8 +11,8 @@ export const WATER_GUN_RANGE = 260;
 // El chorro de agua sale en parabola (afectado por la gravedad del mundo)
 // en vez de en linea recta; estos son su velocidad horizontal y el impulso
 // vertical inicial hacia arriba.
-export const WATER_GUN_SPEED_X = 550;
-export const WATER_GUN_LAUNCH_VY = -100;
+export const WATER_GUN_SPEED_X = 650;
+export const WATER_GUN_LAUNCH_VY = -80;
 
 export const PLAYER_MAX_HEALTH = 100;
 export const PLAYER_TOUCH_DAMAGE = 10;

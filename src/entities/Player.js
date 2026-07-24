@@ -15,11 +15,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.setScale(0.22);
+    this.setScale(0.28);
     this.setCollideWorldBounds(true);
     this.setBounce(0.05);
     this.body.setSize(190, 390);
-    this.body.setOffset(161, 88);
+    // La base del cuerpo fisico coincide con la linea de pies (y = 433) de
+    // los frames terrestres de la hoja 512x512.
+    this.body.setOffset(161, 43);
 
     this.bullets = bulletGroup;
     this.health = PLAYER_MAX_HEALTH;
@@ -49,9 +51,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         key: 'begitxo-run',
         frames: [
           { key: 'player', frame: 2 },
-          { key: 'player', frame: 1 },
+          { key: 'player', frame: 5 },
           { key: 'player', frame: 3 },
-          { key: 'player', frame: 1 }
+          { key: 'player', frame: 5 }
         ],
         frameRate: 10,
         repeat: -1
