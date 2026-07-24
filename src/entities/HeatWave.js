@@ -1,16 +1,32 @@
+import Phaser from 'phaser';
 import Enemy from './Enemy.js';
 
-// Enemigo tematico: una bola de aire abrasador. La logica de patrulla y de
+// Enemigo tematico: un pequeno tornado de fuego. La logica de patrulla y de
 // recibir dano se hereda de Enemy.
-// Su textura es la bola de aire abrasador cargada como 'heatwave'.
+// Sus seis frames se cargan como 'heatwave' y forman un giro continuo.
 export default class HeatWave extends Enemy {
   constructor(scene, x, y, patrolMinX, patrolMaxX, speed) {
     super(scene, x, y, patrolMinX, patrolMaxX, speed);
     this.setTexture('heatwave');
+    this.setScale(1, 1.35);
+    this.play('heatwave-spin');
+    this.hoverY = y;
+    this.body.setAllowGravity(false);
+    this.setVelocityY(0);
 
-    // El cuerpo heredado ocupaba los 64 px del lienzo, incluidos el halo y
-    // las ondas laterales transparentes. El dano solo debe corresponder al
-    // nucleo visible de la bola.
-    this.body.setCircle(20, 12, 12);
+    // El cuerpo sigue la zona central y termina junto a la punta visible.
+    // Así el tornado descansa sobre la plataforma sin quedar incrustado.
+    this.body.setCircle(20, 12, 10);
+  }
+
+  update() {
+    super.update();
+    if (!this.active || !this.body) return;
+
+    // Mantiene el tornado en su carril aunque otra colision o paso de fisica
+    // intente desplazarlo fuera de la plataforma.
+    this.y = this.hoverY;
+    this.x = Phaser.Math.Clamp(this.x, this.patrolMinX, this.patrolMaxX);
+    this.setVelocityY(0);
   }
 }

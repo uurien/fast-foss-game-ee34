@@ -10,13 +10,26 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('heat-zone-1', 'assets/heat-zone-1.png');
     this.load.image('heat-zone-2', 'assets/heat-zone-2.png');
     this.load.image('heat-zone-3', 'assets/heat-zone-3.png');
-    this.load.image('heatwave', 'assets/heatwave.png');
+    this.load.spritesheet('heatwave', 'assets/fire-tornado-spin-6x64.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    });
   }
 
   create() {
     this.createBegitxoSpritesheet();
+    this.createHeatWaveAnimation();
     this.generatePlaceholderTextures();
     this.scene.start('Game');
+  }
+
+  createHeatWaveAnimation() {
+    this.anims.create({
+      key: 'heatwave-spin',
+      frames: this.anims.generateFrameNumbers('heatwave', { start: 0, end: 5 }),
+      frameRate: 12,
+      repeat: -1
+    });
   }
 
   createBegitxoSpritesheet() {

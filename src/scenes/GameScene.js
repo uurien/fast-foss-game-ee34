@@ -71,7 +71,8 @@ export default class GameScene extends Phaser.Scene {
     this.nextHeatZoneDamageAt = 0;
 
     this.physics.add.collider(this.player, this.platforms);
-    this.physics.add.collider(this.enemies, this.platforms);
+    // Los tornados flotan en un carril fijo y no necesitan apoyo fisico de
+    // las plataformas; el colisionador podia expulsarlos en las uniones.
     this.physics.add.collider(this.bullets, this.platforms, (bullet) => this.deactivateBullet(bullet));
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => this.onBulletHitsEnemy(bullet, enemy));
