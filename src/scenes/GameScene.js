@@ -3,6 +3,7 @@ import Player from '../entities/Player.js';
 import HeatWave from '../entities/HeatWave.js';
 import { buildLevel } from '../entities/Platforms.js';
 import {
+  GAME_WIDTH,
   GAME_HEIGHT,
   LEVEL_WIDTH,
   PLAYER_TOUCH_DAMAGE,
@@ -20,11 +21,12 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.isRestarting = false;
+    this.hasWon = false;
     this.physics.world.setBounds(0, 0, LEVEL_WIDTH, GAME_HEIGHT);
 
     this.drawBackground();
 
-    const { platforms, enemySpawns, heatZones } = buildLevel(this);
+    const { platforms, enemySpawns, heatZones, goal } = buildLevel(this);
     this.platforms = platforms;
 
     this.bullets = this.physics.add.group({
@@ -70,6 +72,10 @@ export default class GameScene extends Phaser.Scene {
     });
     this.nextHeatZoneDamageAt = 0;
 
+    // Objetivo del nivel: la heladeria al final del recorrido. Tocarla gana
+    // la partida.
+    this.goal = this.physics.add.staticImage(goal.x, goal.y, 'heladeria').setDepth(2);
+
     this.physics.add.collider(this.player, this.platforms);
     // Los tornados flotan en un carril fijo y no necesitan apoyo fisico de
     // las plataformas; el colisionador podia expulsarlos en las uniones.
@@ -77,6 +83,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => this.onBulletHitsEnemy(bullet, enemy));
     this.physics.add.overlap(this.player, this.enemies, (player, enemy) => this.onPlayerTouchesEnemy(enemy));
+    this.physics.add.overlap(this.player, this.goal, () => this.onReachGoal());
 
     this.cameras.main.setBounds(0, 0, LEVEL_WIDTH, GAME_HEIGHT);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
@@ -86,7 +93,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time) {
-    if (this.isRestarting) return;
+    if (this.isRestarting || this.hasWon) return;
 
     this.updateHeatZones(time);
     this.player.update(time);
@@ -180,6 +187,24 @@ export default class GameScene extends Phaser.Scene {
       this.time.delayedCall(150, () => this.scene.restart());
     }
     return died;
+  }
+
+  onReachGoal() {
+    if (this.isRestarting || this.hasWon) return;
+
+    this.hasWon = true;
+    this.physics.pause();
+
+    this.add
+      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, '¡Begitxo llega a la heladeria!\n¡Nivel completado!', {
+        fontSize: '28px',
+        fontFamily: 'monospace',
+        color: '#ffffff',
+        align: 'center'
+      })
+      .setScrollFactor(0)
+      .setOrigin(0.5)
+      .setDepth(20);
   }
 
   deactivateBullet(bullet) {

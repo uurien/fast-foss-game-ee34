@@ -108,6 +108,52 @@ export default class PreloadScene extends Phaser.Scene {
     g.generateTexture('platform', 64, 32);
     g.clear();
 
+    this.generateHeladeriaTexture(g);
+
     g.destroy();
+  }
+
+  // Objetivo del nivel: una heladeria muy sencilla (fachada + toldo a
+  // rayas + un cucurucho de bolas en el tejado a modo de cartel).
+  // Placeholder hasta tener el arte definitivo.
+  generateHeladeriaTexture(g) {
+    const width = 140;
+    const height = 200;
+
+    g.fillStyle(0xfff2e0, 1);
+    g.fillRect(0, 40, width, height - 40);
+    g.lineStyle(3, 0xc9a27a, 1);
+    g.strokeRect(1, 40, width - 2, height - 41);
+
+    // Toldo a rayas justo encima de la fachada.
+    const stripeCount = 7;
+    const stripeWidth = width / stripeCount;
+    for (let i = 0; i < stripeCount; i += 1) {
+      g.fillStyle(i % 2 === 0 ? 0xff6f91 : 0xfff2e0, 1);
+      g.fillRect(i * stripeWidth, 44, stripeWidth, 16);
+    }
+
+    // Puerta.
+    g.fillStyle(0x6b5227, 1);
+    g.fillRect(width / 2 - 16, height - 66, 32, 66);
+
+    // Ventanas.
+    g.fillStyle(0xa8dadc, 1);
+    g.fillRect(16, 96, 28, 28);
+    g.fillRect(width - 44, 96, 28, 28);
+
+    // Cucurucho de bolas sobre el tejado, a modo de cartel.
+    g.fillStyle(0x8d6e37, 1);
+    g.fillTriangle(width / 2 - 10, 40, width / 2 + 10, 40, width / 2, 16);
+
+    g.fillStyle(0xffb6c1, 1);
+    g.fillCircle(width / 2, 12, 12);
+    g.fillStyle(0xa8dadc, 1);
+    g.fillCircle(width / 2 - 12, 20, 10);
+    g.fillStyle(0xfff2b2, 1);
+    g.fillCircle(width / 2 + 12, 20, 10);
+
+    g.generateTexture('heladeria', width, height);
+    g.clear();
   }
 }
