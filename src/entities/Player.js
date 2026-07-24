@@ -71,8 +71,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   update(time) {
     const left = this.cursors.left.isDown || this.keys.A.isDown;
     const right = this.cursors.right.isDown || this.keys.D.isDown;
-    const jump = this.cursors.up.isDown || this.keys.W.isDown || this.keys.SPACE.isDown;
-    const shoot = this.keys.X.isDown || this.scene.input.activePointer.isDown;
+    const jump = this.cursors.up.isDown || this.keys.W.isDown;
+    const shoot = this.keys.X.isDown || this.keys.SPACE.isDown || this.scene.input.activePointer.isDown;
 
     const speed = PLAYER_SPEED * this.speedMultiplier;
 
