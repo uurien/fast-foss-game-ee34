@@ -12,7 +12,10 @@ export function buildLevel(scene) {
 
   const groundY = GAME_HEIGHT - TILE_H / 2;
   for (let x = 0; x < LEVEL_WIDTH; x += TILE_W) {
-    platforms.create(x + TILE_W / 2, groundY, 'platform');
+    // El suelo usa una unica baldosa repetible. No depende de las imágenes
+    // de fachadas, de modo que sus juntas nunca cambian de perspectiva al
+    // pasar de un panel urbano al siguiente.
+    platforms.create(x + TILE_W / 2, groundY, 'street-ground');
   }
 
   // Plataformas flotantes a lo largo de todo el nivel, alternando altura

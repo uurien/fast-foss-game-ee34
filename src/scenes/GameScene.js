@@ -57,19 +57,12 @@ export default class GameScene extends Phaser.Scene {
       (zone) => new Phaser.Geom.Rectangle(zone.x - zone.width / 2, zone.y - zone.height / 2, zone.width, zone.height)
     );
     heatZones.forEach((zone) => {
-      // Una variante por baldosa evita que los tres tramos repitan el mismo
-      // dibujo. Comparten centro y tamano con las tablas del suelo, de modo
-      // que actuan como decal por encima de la madera.
-      const startX = zone.x - zone.width / 2;
-      for (let offset = 0; offset < zone.width; offset += 64) {
-        const variant = (offset / 64) % 3;
-        // El decal es ligeramente mas alto que la baldosa y se desplaza dos
-        // pixeles hacia abajo para ajustar visualmente su linea de suelo.
-        this.add
-          .image(startX + offset + 32, zone.y + 2, `heat-zone-${variant + 1}`)
-          .setDisplaySize(64, 36)
-          .setDepth(1);
-      }
+      // Una sola rejilla continua cubre el tramo completo de la zona.
+      this.add
+        .sprite(zone.x, zone.y - 28, 'hot-air-vent')
+        .setDisplaySize(zone.width, 64)
+        .setDepth(1)
+        .play('hot-air-vent-blow');
     });
     this.nextHeatZoneDamageAt = 0;
 
@@ -127,15 +120,88 @@ export default class GameScene extends Phaser.Scene {
   }
 
   drawBackground() {
-    // Fondo de "ola de calor": degradado naranja/rojo con sol, de fondo
-    // provisional hasta tener arte definitivo del tema.
-    const g = this.add.graphics();
-    g.fillGradientStyle(0xffb347, 0xffb347, 0xff5e62, 0xff5e62, 1);
-    g.fillRect(0, 0, LEVEL_WIDTH, GAME_HEIGHT);
-    g.setScrollFactor(0.3);
+    const panelWidth = GAME_WIDTH;
+    // Las versiones blend llevan 128 px de fundido en una fuente de 1672
+    // px. Escalado al viewport son unos 74 px por borde. El solape debe
+    // cubrir los dos fundidos: asi siempre hay un panel completamente opaco
+    // bajo el que se desvanece y no se transparenta la capa inferior.
+    const backgroundOverlap = 148;
+    const backgroundPanelStep = panelWidth - backgroundOverlap;
 
-    const sun = this.add.circle(150, 100, 50, 0xfff176, 1);
-    sun.setScrollFactor(0.3);
+    this.add
+      .image(0, 0, 'city-sky')
+      .setOrigin(0)
+      .setDisplaySize(GAME_WIDTH, GAME_HEIGHT)
+      .setScrollFactor(0)
+      .setDepth(-40);
+
+    this.addParallaxStrip({
+      keys: ['city-distant-a', 'city-distant-b'],
+      scrollFactor: 0.15,
+      depth: -30,
+      y: 0,
+      panelWidth,
+      panelStep: backgroundPanelStep
+    });
+
+    this.addParallaxStrip({
+      keys: ['city-mid-a', 'city-mid-b', 'city-mid-b', 'city-mid-a'],
+      scrollFactor: 0.4,
+      depth: -20,
+      y: 0,
+      panelWidth,
+      panelStep: backgroundPanelStep
+    });
+
+    // Una sola textura cubre todo el nivel para evitar repeticiones y
+    // costuras creadas en tiempo de ejecucion.
+    const foreground = this.add
+      .image(0, 0, 'city-foreground-full')
+      .setOrigin(0)
+      .setDisplaySize(LEVEL_WIDTH, 620)
+      .setScrollFactor(1)
+      .setDepth(-10);
+    const foregroundCropHeight = Math.ceil(
+      foreground.height * ((GAME_HEIGHT - 32) / 620)
+    );
+    foreground.setCrop(0, 0, foreground.width, foregroundCropHeight);
+  }
+
+  addParallaxStrip({
+    keys,
+    scrollFactor,
+    depth,
+    y,
+    panelWidth,
+    panelHeight = GAME_HEIGHT,
+    cropBottomAt = null,
+    alternateFlip = true,
+    panelStep
+  }) {
+    const cameraTravel = Math.max(0, LEVEL_WIDTH - GAME_WIDTH);
+    const visibleTravel = cameraTravel * scrollFactor;
+    const panelCount = Math.ceil((visibleTravel + GAME_WIDTH) / panelStep) + 1;
+    const edgeFeather = 74;
+
+    for (let index = 0; index < panelCount; index += 1) {
+      const image = this.add
+        // El primer fundido queda fuera del viewport; asi no aparece una
+        // franja transparente al inicio del nivel.
+        .image(index * panelStep - edgeFeather, y, keys[index % keys.length])
+        .setOrigin(0)
+        .setDisplaySize(panelWidth, panelHeight)
+        .setScrollFactor(scrollFactor)
+        .setDepth(depth);
+
+      // Alternar la orientacion reduce aun mas la repeticion sin cambiar la
+      // altura de las bandas de suelo ni el ancho del solape.
+      image.setFlipX(alternateFlip && index % 2 === 1);
+
+      if (cropBottomAt !== null) {
+        const sourceCropHeight = Math.ceil(image.height * ((cropBottomAt - y) / panelHeight));
+        image.setCrop(0, 0, image.width, sourceCropHeight);
+      }
+    }
   }
 
   createHUD() {

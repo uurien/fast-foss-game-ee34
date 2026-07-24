@@ -12,16 +12,16 @@ export const WATER_GUN_RANGE = 260;
 // en vez de en linea recta; estos son su velocidad horizontal y el impulso
 // vertical inicial hacia arriba.
 export const WATER_GUN_SPEED_X = 650;
-export const WATER_GUN_LAUNCH_VY = -80;
+export const WATER_GUN_LAUNCH_VY = -20;
 
 export const PLAYER_MAX_HEALTH = 100;
-export const PLAYER_TOUCH_DAMAGE = 30;
+export const PLAYER_TOUCH_DAMAGE = 0;
 export const PLAYER_INVULNERABLE_MS = 1000;
 
 export const ENEMY_MAX_HEALTH = 20;
-export const BULLET_DAMAGE = 10;
+export const BULLET_DAMAGE = 1;
 
 
 export const HEAT_ZONE_SLOW_FACTOR = 0.5;
-export const HEAT_ZONE_DAMAGE_PER_TICK = 5;
+export const HEAT_ZONE_DAMAGE_PER_TICK = 0;
 export const HEAT_ZONE_TICK_MS = 500;

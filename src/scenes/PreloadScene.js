@@ -6,10 +6,17 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('city-sky', 'assets/city-parallax/layer-01-sky-sun.png');
+    this.load.image('city-distant-a', 'assets/city-parallax/layer-02-distant-buildings-blend.png');
+    this.load.image('city-distant-b', 'assets/city-parallax/layer-02-distant-buildings-b-blend.png');
+    this.load.image('city-mid-a', 'assets/city-parallax/layer-03-mid-buildings-blend.png');
+    this.load.image('city-mid-b', 'assets/city-parallax/layer-03-mid-buildings-b-blend.png');
+    this.load.image('city-foreground-full', 'assets/city-parallax/layer-04-foreground-full-7200-v3.png');
     this.load.image('begitxo-source', 'assets/begitxo-poses-6-green.png');
-    this.load.image('heat-zone-1', 'assets/heat-zone-1.png');
-    this.load.image('heat-zone-2', 'assets/heat-zone-2.png');
-    this.load.image('heat-zone-3', 'assets/heat-zone-3.png');
+    this.load.spritesheet('hot-air-vent', 'assets/hazards/hot-air-vent-wide-6x192.png', {
+      frameWidth: 192,
+      frameHeight: 64
+    });
     this.load.image('health-bar-clean', 'assets/health-bar-clean.png');
     this.load.image('health-bar-burned', 'assets/health-bar-burned.png');
     this.load.image('heladeria', 'assets/heladeria-begitxo.png');
@@ -22,6 +29,7 @@ export default class PreloadScene extends Phaser.Scene {
   create() {
     this.createBegitxoSpritesheet();
     this.createHeatWaveAnimation();
+    this.createHotAirVentAnimation();
     this.generatePlaceholderTextures();
     this.scene.start('Game');
   }
@@ -104,13 +112,53 @@ export default class PreloadScene extends Phaser.Scene {
     g.generateTexture('bullet', 12, 6);
     g.clear();
 
-    g.fillStyle(0x8d6e37, 1);
+    // Baldosa urbana: bordillo de hormigon sobre asfalto oscuro. Se usa
+    // tanto en el suelo como en las plataformas hasta tener un tileset
+    // dedicado para cada tipo de superficie.
+    g.fillStyle(0x3b3a42, 1);
     g.fillRect(0, 0, 64, 32);
-    g.lineStyle(2, 0x6b5227, 1);
+    g.fillStyle(0x77717a, 1);
+    g.fillRect(0, 0, 64, 8);
+    g.fillStyle(0x57535d, 1);
+    g.fillRect(0, 8, 64, 3);
+    g.lineStyle(2, 0x24242a, 1);
     g.strokeRect(1, 1, 62, 30);
+    g.lineBetween(32, 1, 32, 9);
     g.generateTexture('platform', 64, 32);
     g.clear();
 
+    // Suelo continuo de la calle. Esta textura se repite en todas las
+    // celdas fisicas para que las juntas del pavimento mantengan siempre
+    // el mismo angulo, independientemente del panel de fachadas situado
+    // detras. Los extremos izquierdo y derecho son compatibles.
+    g.fillStyle(0x9a6445, 1);
+    g.fillRect(0, 0, 64, 17);
+    g.fillStyle(0x6f4638, 1);
+    g.fillRect(0, 17, 64, 7);
+    g.fillStyle(0x292830, 1);
+    g.fillRect(0, 24, 64, 8);
+
+    g.lineStyle(1, 0x5c3c35, 1);
+    g.lineBetween(0, 16, 64, 16);
+    g.lineBetween(0, 23, 64, 23);
+    // Dos juntas inclinadas por baldosa. Al repetirse conservan pendiente,
+    // ritmo y punto de encuentro en todos los cambios de imagen.
+    g.lineBetween(18, 0, 14, 16);
+    g.lineBetween(50, 0, 46, 16);
+    g.lineStyle(1, 0xb87b52, 0.7);
+    g.lineBetween(0, 1, 64, 1);
+    g.generateTexture('street-ground', 64, 32);
+    g.clear();
+
     g.destroy();
+  }
+
+  createHotAirVentAnimation() {
+    this.anims.create({
+      key: 'hot-air-vent-blow',
+      frames: this.anims.generateFrameNumbers('hot-air-vent', { start: 0, end: 5 }),
+      frameRate: 7,
+      repeat: -1
+    });
   }
 }
