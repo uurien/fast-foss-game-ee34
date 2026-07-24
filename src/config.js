@@ -1,6 +1,6 @@
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
-export const LEVEL_WIDTH = 2400;
+export const LEVEL_WIDTH = 7200;
 
 export const PLAYER_SPEED = 220;
 export const JUMP_VELOCITY = -640;
