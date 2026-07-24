@@ -10,6 +10,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('heat-zone-1', 'assets/heat-zone-1.png');
     this.load.image('heat-zone-2', 'assets/heat-zone-2.png');
     this.load.image('heat-zone-3', 'assets/heat-zone-3.png');
+    this.load.image('health-bar-clean', 'assets/health-bar-clean.png');
+    this.load.image('health-bar-burned', 'assets/health-bar-burned.png');
     this.load.image('heladeria', 'assets/heladeria-begitxo.png');
     this.load.spritesheet('heatwave', 'assets/fire-tornado-spin-6x64.png', {
       frameWidth: 64,

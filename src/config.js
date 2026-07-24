@@ -15,7 +15,7 @@ export const WATER_GUN_SPEED_X = 650;
 export const WATER_GUN_LAUNCH_VY = -80;
 
 export const PLAYER_MAX_HEALTH = 100;
-export const PLAYER_TOUCH_DAMAGE = 10;
+export const PLAYER_TOUCH_DAMAGE = 30;
 export const PLAYER_INVULNERABLE_MS = 1000;
 
 export const ENEMY_MAX_HEALTH = 20;

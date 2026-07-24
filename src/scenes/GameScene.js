@@ -11,7 +11,8 @@ import {
   WATER_GUN_RANGE,
   HEAT_ZONE_SLOW_FACTOR,
   HEAT_ZONE_DAMAGE_PER_TICK,
-  HEAT_ZONE_TICK_MS
+  HEAT_ZONE_TICK_MS,
+  PLAYER_MAX_HEALTH
 } from '../config.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -138,13 +139,21 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createHUD() {
-    this.healthText = this.add
-      .text(16, 16, '', { fontSize: '20px', fontFamily: 'monospace', color: '#ffffff' })
+    this.add
+      .image(12, 12, 'health-bar-clean')
+      .setOrigin(0)
       .setScrollFactor(0)
       .setDepth(10);
 
+    this.burnedHealthBar = this.add
+      .image(12, 12, 'health-bar-burned')
+      .setOrigin(0)
+      .setScrollFactor(0)
+      .setDepth(11);
+
     this.scoreText = this.add
-      .text(16, 40, '', { fontSize: '20px', fontFamily: 'monospace', color: '#ffffff' })
+      .text(GAME_WIDTH - 16, 16, '', { fontSize: '20px', fontFamily: 'monospace', color: '#ffffff' })
+      .setOrigin(1, 0)
       .setScrollFactor(0)
       .setDepth(10);
 
@@ -152,8 +161,20 @@ export default class GameScene extends Phaser.Scene {
   }
 
   updateHUD() {
-    this.healthText.setText(`Vida: ${this.player.health}`);
-    this.scoreText.setText(`Puntos: ${this.score}`);
+    this.drawHealthBar();
+    this.scoreText.setText(`${this.score}`);
+  }
+
+  drawHealthBar() {
+    const burnedFraction = Phaser.Math.Clamp(1 - this.player.health / PLAYER_MAX_HEALTH, 0, 1);
+    const iconWidth = 34;
+    const cellsWidth = this.burnedHealthBar.width - iconWidth;
+    const burnedWidth = Math.round(iconWidth + cellsWidth * burnedFraction);
+
+    this.burnedHealthBar.setVisible(burnedFraction > 0);
+    if (burnedFraction > 0) {
+      this.burnedHealthBar.setCrop(0, 0, burnedWidth, this.burnedHealthBar.height);
+    }
   }
 
   onBulletHitsEnemy(bullet, enemy) {
