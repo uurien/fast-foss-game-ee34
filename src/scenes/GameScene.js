@@ -82,7 +82,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.bullets, this.platforms, (bullet) => this.deactivateBullet(bullet));
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => this.onBulletHitsEnemy(bullet, enemy));
-    this.physics.add.overlap(this.player, this.enemies, (player, enemy) => this.onPlayerTouchesEnemy(enemy));
+    this.physics.add.collider(this.player, this.enemies, (player, enemy) => this.onPlayerTouchesEnemy(enemy));
     this.physics.add.overlap(this.player, this.goal, () => this.onReachGoal());
 
     this.cameras.main.setBounds(0, 0, LEVEL_WIDTH, GAME_HEIGHT);
