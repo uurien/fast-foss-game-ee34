@@ -54,8 +54,6 @@ export default class FireStorm extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount) {
     if (!this.active) return false;
 
-    console.log(`TAKE DAMAGEEEEEE - ${amount}/${this.health}`)
-
     this.health = Math.max(0, this.health - amount);
     this.setTintFill(0xffffff);
     this.scene.time.delayedCall(70, () => {
@@ -63,7 +61,6 @@ export default class FireStorm extends Phaser.Physics.Arcade.Sprite {
     });
 
     if (this.health > 0) return false;
-    console.log('DESTROY????')
     this.destroy();
     return true;
   }
