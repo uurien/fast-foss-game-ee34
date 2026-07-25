@@ -44,12 +44,23 @@ export function buildLevel(scene) {
   const streetTopY = GAME_HEIGHT - TILE_H;
   obstacles.forEach(({ x, key }) => {
     const isContainer = key === 'obstacle-container';
-    const width = isContainer ? 176 : 82;
-    const height = isContainer ? 104 : 84;
-    platforms
+    const width = isContainer ? 176 : 112;
+    const height = isContainer ? 104 : 74;
+    const obstacle = platforms
       .create(x, streetTopY - height / 2, key)
       .setDisplaySize(width, height)
       .refreshBody();
+
+    // Las siluetas no son rectangulos perfectos: la caja tiene esquinas
+    // superiores inclinadas y el contenedor asas y laterales salientes. Un
+    // cuerpo del tamaño completo incluye esos pixeles transparentes y hace
+    // que Begitxo parezca flotar. El cuerpo interior conserva la base en el
+    // asfalto y elimina ese margen invisible de colision.
+    const insetX = isContainer ? 12 : 10;
+    const insetTop = isContainer ? 7 : 10;
+    obstacle.body
+      .setSize(width - insetX * 2, height - insetTop, false)
+      .setOffset(insetX, insetTop);
   });
 
   // Todos los tornados patrullan a ras de suelo. Conservan recorridos de
