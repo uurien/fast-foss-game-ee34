@@ -1,4 +1,4 @@
-import { LEVEL_WIDTH, GAME_HEIGHT } from '../config.js';
+import { LEVEL_WIDTH, GAME_HEIGHT, BOSS_TRIGGER_X } from '../config.js';
 
 const TILE_W = 64;
 const TILE_H = 32;
@@ -34,8 +34,7 @@ export function buildLevel(scene) {
     { x: 4420, key: 'obstacle-container' },
     { x: 4810, key: 'obstacle-crate' },
     { x: 5320, key: 'obstacle-container' },
-    { x: 5710, key: 'obstacle-crate' },
-    { x: 6250, key: 'obstacle-container' }
+    { x: 5710, key: 'obstacle-crate' }
   ];
 
   const streetTopY = GAME_HEIGHT - TILE_H;
@@ -70,9 +69,7 @@ export function buildLevel(scene) {
     { x: 2350, y: tornadoGroundY, minX: 2350, maxX: 2500, speed: 65 },
     { x: 3210, y: tornadoGroundY, minX: 3210, maxX: 3380, speed: 70 },
     { x: 4100, y: tornadoGroundY, minX: 4100, maxX: 4250, speed: 75 },
-    { x: 5000, y: tornadoGroundY, minX: 5000, maxX: 5170, speed: 80 },
-    { x: 5900, y: tornadoGroundY, minX: 5900, maxX: 6080, speed: 85 },
-    { x: 6500, y: tornadoGroundY, minX: 6500, maxX: 6700, speed: 90 }
+    { x: 5000, y: tornadoGroundY, minX: 5000, maxX: 5170, speed: 80 }
   ];
 
   // Zonas de calor: tramos de suelo (asfalto derretido) que ralentizan y
@@ -93,6 +90,19 @@ export function buildLevel(scene) {
   // Objetivo al final del nivel. La imagen mide 200 px de alto y queda
   // apoyada sobre el borde superior de las baldosas.
   const goal = { x: LEVEL_WIDTH - 160, y: groundY - TILE_H / 2 - 100 };
+  // Al activarse el combate, Eguzkitzarra debe quedar claramente dentro de
+  // la camara. Antes aparecia demasiado cerca del extremo derecho y su
+  // oscilacion podia dejar el sprite completamente fuera de pantalla aunque
+  // el HUD indicase que la pelea ya habia empezado.
+  const boss = {
+    x: 6580,
+    y: 320,
+    // Se cierra justo detras del jugador en cuanto arranca el combate, para
+    // que no pueda retroceder y esquivar al jefe saliendo de la arena.
+    arenaEntranceX: BOSS_TRIGGER_X,
+    arenaExitX: 6940,
+    stormGroundY: tornadoGroundY
+  };
 
-  return { platforms, enemySpawns, heatZones, goal };
+  return { platforms, enemySpawns, heatZones, goal, boss };
 }

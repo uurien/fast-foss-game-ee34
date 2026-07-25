@@ -20,6 +20,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('health-bar-clean', 'assets/health-bar-clean.png');
     this.load.image('health-bar-burned', 'assets/health-bar-burned.png');
     this.load.image('heladeria', 'assets/heladeria-begitxo.png');
+    this.load.image('eguzkitzarra', 'assets/eguzkitzarra-boss-concept-v3.png');
     this.load.image('obstacle-crate', 'assets/obstacles/crate-03.png');
     this.load.image('obstacle-container', 'assets/obstacles/container-04-large.png');
     this.load.spritesheet('heatwave', 'assets/fire-tornado-spin-6x64.png', {

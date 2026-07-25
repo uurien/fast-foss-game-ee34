@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player.js';
 import HeatWave from '../entities/HeatWave.js';
+import FireStorm from '../entities/FireStorm.js';
+import Eguzkitzarra from '../entities/Eguzkitzarra.js';
 import { buildLevel } from '../entities/Platforms.js';
 import {
   GAME_WIDTH,
@@ -12,7 +14,10 @@ import {
   HEAT_ZONE_SLOW_FACTOR,
   HEAT_ZONE_DAMAGE_PER_TICK,
   HEAT_ZONE_TICK_MS,
-  PLAYER_MAX_HEALTH
+  PLAYER_MAX_HEALTH,
+  BOSS_MAX_HEALTH,
+  BOSS_TRIGGER_X,
+  BOSS_MAX_STORMS
 } from '../config.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -27,7 +32,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.drawBackground();
 
-    const { platforms, enemySpawns, heatZones, goal } = buildLevel(this);
+    const { platforms, enemySpawns, heatZones, goal, boss } = buildLevel(this);
     this.platforms = platforms;
 
     this.bullets = this.physics.add.group({
@@ -36,7 +41,7 @@ export default class GameScene extends Phaser.Scene {
       allowGravity: false
     });
 
-    this.player = new Player(this, 100, GAME_HEIGHT - 150, this.bullets);
+    this.player = new Player(this, 5500, GAME_HEIGHT - 150, this.bullets);
     this.player.setDepth(2);
 
     this.enemies = this.physics.add.group();
@@ -52,6 +57,11 @@ export default class GameScene extends Phaser.Scene {
       enemy.setDepth(2);
       this.enemies.add(enemy);
     });
+
+    this.bossStorms = this.physics.add.group();
+    this.bossDefeated = false;
+    this.boss = new Eguzkitzarra(this, boss.x, boss.y);
+    this.bossStormGroundY = boss.stormGroundY;
 
     this.heatZoneRects = heatZones.map(
       (zone) => new Phaser.Geom.Rectangle(zone.x - zone.width / 2, zone.y - zone.height / 2, zone.width, zone.height)
@@ -72,14 +82,51 @@ export default class GameScene extends Phaser.Scene {
     // Objetivo del nivel: la heladeria al final del recorrido. Tocarla gana
     // la partida.
     this.goal = this.physics.add.staticImage(goal.x, goal.y, 'heladeria').setDepth(2);
+    this.goal.setVisible(false).setAlpha(0);
+    this.goal.body.enable = false;
+
+    this.arenaExit = this.add
+      .rectangle(boss.arenaExitX, GAME_HEIGHT / 2, 24, GAME_HEIGHT, 0xff6b1a, 0.82)
+      .setDepth(4)
+      .setVisible(false);
+    this.physics.add.existing(this.arenaExit, true);
+    this.arenaExit.body.enable = false;
+
+    // Se cierra a la espalda del jugador al empezar el combate, para que no
+    // pueda salir corriendo de la arena y esquivar al jefe.
+    this.arenaEntrance = this.add
+      .rectangle(boss.arenaEntranceX, GAME_HEIGHT / 2, 24, GAME_HEIGHT, 0xff6b1a, 0.82)
+      .setDepth(4)
+      .setVisible(false);
+    this.physics.add.existing(this.arenaEntrance, true);
+    this.arenaEntrance.body.enable = false;
 
     this.physics.add.collider(this.player, this.platforms);
     // Los tornados mantienen su base fijada al asfalto y no necesitan un
     // colisionador con el suelo, que podria expulsarlos en las uniones.
     this.physics.add.collider(this.bullets, this.platforms, (bullet) => this.deactivateBullet(bullet));
+    this.physics.add.collider(this.player, this.arenaExit);
+    this.physics.add.collider(this.player, this.arenaEntrance);
+    this.physics.add.collider(this.bossStorms, this.platforms, (storm) => storm.land());
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => this.onBulletHitsEnemy(bullet, enemy));
-    this.physics.add.collider(this.player, this.enemies, (player, enemy) => this.onPlayerTouchesEnemy(enemy));
+    this.physics.add.overlap(this.bullets, this.bossStorms, (bullet, storm) => this.onBulletHitsEnemy(bullet, storm));
+    // Cuando uno de los dos lados es un objeto suelto (no un grupo), Arcade
+    // Physics invierte el orden de los argumentos del callback respecto al
+    // orden en que se registraron aqui (los pasa como sprite-suelto,
+    // miembro-del-grupo). Comprobamos pertenencia al grupo en vez de fiarnos
+    // de la posicion: si no, "bullet"/"enemy" reciben en realidad al jefe o
+    // al jugador y se les aplica deactivateBullet()/daño por error.
+    this.physics.add.overlap(this.bullets, this.boss, (a, b) => {
+      this.onBulletHitsBoss(this.bullets.contains(a) ? a : b);
+    });
+    this.physics.add.collider(this.player, this.enemies, (a, b) => {
+      this.onPlayerTouchesEnemy(this.enemies.contains(a) ? a : b);
+    });
+    this.physics.add.overlap(this.player, this.bossStorms, (a, b) => {
+      this.onPlayerTouchesEnemy(this.bossStorms.contains(a) ? a : b);
+    });
+    this.physics.add.overlap(this.player, this.boss, () => this.damagePlayer(PLAYER_TOUCH_DAMAGE, this.time.now));
     this.physics.add.overlap(this.player, this.goal, () => this.onReachGoal());
 
     this.cameras.main.setBounds(0, 0, LEVEL_WIDTH, GAME_HEIGHT);
@@ -94,8 +141,13 @@ export default class GameScene extends Phaser.Scene {
 
     this.updateHeatZones(time);
     this.player.update(time);
+    if (!this.boss.awake && this.player.x >= BOSS_TRIGGER_X) this.startBossFight(time);
+    if (this.boss.active) this.boss.update(time);
     this.enemies.getChildren().forEach((enemy) => {
       if (enemy.active) enemy.update(time);
+    });
+    this.bossStorms.getChildren().forEach((storm) => {
+      if (storm.active) storm.update(time);
     });
 
     this.bullets.getChildren().forEach((bullet) => {
@@ -226,6 +278,28 @@ export default class GameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(10);
 
+    this.bossHud = this.add.container(GAME_WIDTH / 2, 22)
+      .setScrollFactor(0)
+      .setDepth(12)
+      .setVisible(false);
+    this.bossBarBack = this.add.rectangle(0, 0, 330, 18, 0x28172d, 0.95)
+      .setStrokeStyle(3, 0xffd85a);
+    this.bossBarFill = this.add.rectangle(-160, 0, 320, 10, 0xf05245)
+      .setOrigin(0, 0.5);
+    this.bossName = this.add.text(0, 17, 'EGUZKITZARRA', {
+      fontFamily: 'monospace',
+      fontSize: '13px',
+      fontStyle: 'bold',
+      color: '#fff2ce'
+    }).setOrigin(0.5, 0);
+    this.bossHealthText = this.add.text(0, -1, `${BOSS_MAX_HEALTH} / ${BOSS_MAX_HEALTH}`, {
+      fontFamily: 'monospace',
+      fontSize: '11px',
+      fontStyle: 'bold',
+      color: '#fff2ce'
+    }).setOrigin(0.5);
+    this.bossHud.add([this.bossBarBack, this.bossBarFill, this.bossName, this.bossHealthText]);
+
     this.updateHUD();
   }
 
@@ -244,6 +318,81 @@ export default class GameScene extends Phaser.Scene {
     if (burnedFraction > 0) {
       this.burnedHealthBar.setCrop(0, 0, burnedWidth, this.burnedHealthBar.height);
     }
+  }
+
+  startBossFight(time) {
+    this.boss.awaken(time);
+    this.bossHud.setVisible(true);
+    this.arenaExit.body.enable = true;
+    this.arenaEntrance.body.enable = true;
+  }
+
+  launchBossStorms(count) {
+    const available = BOSS_MAX_STORMS - this.bossStorms.countActive(true);
+    const launchCount = Math.min(count, available);
+    if (launchCount <= 0) return;
+
+    const offsets = launchCount === 1 ? [0] : [-120, 0, 120];
+    for (let index = 0; index < launchCount; index += 1) {
+      const targetX = Phaser.Math.Clamp(this.player.x + offsets[index], 6400, 6860);
+      const storm = new FireStorm(
+        this,
+        this.boss.x - 45,
+        this.boss.y - 55,
+        targetX,
+        this.bossStormGroundY
+      );
+      this.bossStorms.add(storm);
+    }
+  }
+
+  onBulletHitsBoss(bullet) {
+    if (!bullet.active || !this.boss.active) return;
+
+    this.deactivateBullet(bullet);
+    const result = this.boss.takeDamage(BULLET_DAMAGE);
+    if (!result.hit) {
+      this.cameras.main.shake(70, 0.002);
+      return;
+    }
+
+    const healthFraction = Phaser.Math.Clamp(this.boss.health / BOSS_MAX_HEALTH, 0, 1);
+    this.bossBarFill.setScale(healthFraction, 1);
+    this.bossHealthText.setText(`${this.boss.health} / ${BOSS_MAX_HEALTH}`);
+    if (!result.died) return;
+
+    this.finishBossFight();
+  }
+
+  finishBossFight() {
+    if (this.bossDefeated) return;
+
+    this.score += 100;
+    this.bossDefeated = true;
+    this.bossHud.setVisible(false);
+    this.arenaExit.body.enable = false;
+    this.arenaEntrance.body.enable = false;
+
+    // La recompensa se activa antes de destruir sprites o grupos. Asi una
+    // eventual animacion o callback de muerte nunca puede impedir que la
+    // heladeria aparezca y pueda tocarse.
+    this.goal.setVisible(true);
+    this.goal.body.enable = true;
+    this.tweens.add({ targets: this.goal, alpha: 1, duration: 650, ease: 'Sine.Out' });
+    this.bossStorms.clear(true, true);
+    this.cameras.main.flash(450, 184, 244, 255);
+    this.updateHUD();
+
+    this.tweens.killTweensOf(this.boss);
+    this.tweens.add({
+      targets: this.boss,
+      alpha: 0,
+      scaleX: this.boss.scaleX * 0.72,
+      scaleY: this.boss.scaleY * 0.72,
+      duration: 480,
+      ease: 'Back.In',
+      onComplete: () => this.boss.destroy()
+    });
   }
 
   onBulletHitsEnemy(bullet, enemy) {
@@ -273,15 +422,16 @@ export default class GameScene extends Phaser.Scene {
     this.updateHUD();
     if (died) {
       this.isRestarting = true;
-      this.physics.pause();
       this.player.setVelocity(0, 0);
+      this.player.play('begitxo-idle', true);
+      this.physics.pause();
       this.showEndPopup('game-over');
     }
     return died;
   }
 
   onReachGoal() {
-    if (this.isRestarting || this.hasWon) return;
+    if (this.isRestarting || this.hasWon || !this.bossDefeated) return;
 
     this.hasWon = true;
     this.player.setVelocity(0, 0);

@@ -25,3 +25,11 @@ export const BULLET_DAMAGE = 10;
 export const HEAT_ZONE_SLOW_FACTOR = 0.5;
 export const HEAT_ZONE_DAMAGE_PER_TICK = 10;
 export const HEAT_ZONE_TICK_MS = 500;
+
+export const BOSS_MAX_HEALTH = 300;
+export const BOSS_TRIGGER_X = 6000;
+export const BOSS_TELEGRAPH_MS = 650;
+export const BOSS_VULNERABLE_MS = 1100;
+export const BOSS_ATTACK_COOLDOWN_MS = 1800;
+export const BOSS_MAX_STORMS = 3;
+export const BOSS_STORM_HEALTH = 30;
