@@ -20,7 +20,10 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('health-bar-clean', 'assets/health-bar-clean.png');
     this.load.image('health-bar-burned', 'assets/health-bar-burned.png');
     this.load.image('heladeria', 'assets/heladeria-begitxo.png');
-    this.load.image('eguzkitzarra', 'assets/eguzkitzarra-boss-concept-v3.png');
+    this.load.spritesheet('eguzkitzarra', 'assets/eguzkitzarra-boss-6x512.png', {
+      frameWidth: 512,
+      frameHeight: 512
+    });
     this.load.image('obstacle-crate', 'assets/obstacles/crate-03.png');
     this.load.image('obstacle-container', 'assets/obstacles/container-04-large.png');
     this.load.spritesheet('heatwave', 'assets/fire-tornado-spin-6x64.png', {
@@ -36,6 +39,7 @@ export default class PreloadScene extends Phaser.Scene {
   create() {
     this.createBegitxoSpritesheet();
     this.createHeatWaveAnimation();
+    this.createEguzkitzarraAnimation();
     this.createBossFireColumnAnimation();
     this.createHotAirVentAnimation();
     this.generatePlaceholderTextures();
@@ -47,6 +51,15 @@ export default class PreloadScene extends Phaser.Scene {
       key: 'heatwave-spin',
       frames: this.anims.generateFrameNumbers('heatwave', { start: 0, end: 5 }),
       frameRate: 12,
+      repeat: -1
+    });
+  }
+
+  createEguzkitzarraAnimation() {
+    this.anims.create({
+      key: 'eguzkitzarra-idle',
+      frames: this.anims.generateFrameNumbers('eguzkitzarra', { start: 0, end: 5 }),
+      frameRate: 6,
       repeat: -1
     });
   }

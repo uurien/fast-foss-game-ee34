@@ -23,12 +23,15 @@ export default class Eguzkitzarra extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(8);
     this.body.setAllowGravity(false);
     this.body.setImmovable(true);
-    // El circulo se define en coordenadas de la textura original y despues
+    // El circulo se define en coordenadas de cada frame y despues
     // se escala con setDisplaySize: si el orden se invierte, Arcade Physics
     // puede no recalcular el tamano del cuerpo porque no detecta un cambio
     // de escala, dejando un hitbox varias veces mayor que el sprite visible.
-    this.body.setCircle(410, 165, 110);
-    this.setDisplaySize(220, 230);
+    this.body.setCircle(135, 55, 38);
+    // El personaje ocupa aproximadamente el 75% de cada celda; este tamano
+    // compensa el padding del spritesheet y conserva su escala visual previa.
+    this.setDisplaySize(300, 295);
+    this.play('eguzkitzarra-idle');
   }
 
   awaken(time) {
