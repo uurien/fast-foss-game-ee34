@@ -274,7 +274,8 @@ export default class GameScene extends Phaser.Scene {
     if (died) {
       this.isRestarting = true;
       this.physics.pause();
-      this.time.delayedCall(150, () => this.scene.restart());
+      this.player.setVelocity(0, 0);
+      this.showEndPopup('game-over');
     }
     return died;
   }
@@ -287,16 +288,97 @@ export default class GameScene extends Phaser.Scene {
     this.player.play('begitxo-idle', true);
     this.physics.pause();
 
+    this.showEndPopup('congrats');
+  }
+
+  showEndPopup(type) {
+    const isCongrats = type === 'congrats';
+    const colors = {
+      ink: 0x28172d,
+      cream: 0xfff2ce,
+      coral: 0xf05245,
+      orange: 0xff9a48,
+      yellow: 0xffd85a,
+      blue: 0x24a8cf
+    };
+
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT / 2, '¡Begitxo llega a la heladeria!\n¡Nivel completado!', {
-        fontSize: '28px',
-        fontFamily: 'monospace',
-        color: '#ffffff',
-        align: 'center'
-      })
+      .rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, colors.ink, 0.72)
+      .setOrigin(0)
       .setScrollFactor(0)
-      .setOrigin(0.5)
-      .setDepth(20);
+      .setDepth(30)
+      .setInteractive();
+
+    const popup = this.add.container(GAME_WIDTH / 2, GAME_HEIGHT / 2)
+      .setScrollFactor(0)
+      .setDepth(31)
+      .setScale(0.82)
+      .setAlpha(0);
+
+    const shadow = this.add.rectangle(8, 10, 570, 360, colors.ink, 0.78);
+    const panel = this.add.rectangle(0, 0, 570, 360, colors.cream)
+      .setStrokeStyle(6, isCongrats ? colors.yellow : colors.coral);
+    const ribbon = this.add.rectangle(0, -126, 510, 74, isCongrats ? colors.blue : colors.coral)
+      .setStrokeStyle(4, colors.ink);
+    const eyebrow = this.add.text(0, -73, isCongrats ? 'META ALCANZADA' : 'FIN DE LA PARTIDA', {
+      fontFamily: 'monospace',
+      fontSize: '13px',
+      fontStyle: 'bold',
+      color: '#28172d',
+      letterSpacing: 2
+    }).setOrigin(0.5);
+    const title = this.add.text(0, -128, isCongrats ? 'ZORIONAK!' : 'GAME OVER', {
+      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontSize: isCongrats ? '48px' : '50px',
+      color: '#fff2ce',
+      stroke: '#28172d',
+      strokeThickness: 8,
+      shadow: { offsetX: 3, offsetY: 4, color: isCongrats ? '#f05245' : '#ff9a48', blur: 0, fill: true }
+    }).setOrigin(0.5);
+    const message = this.add.text(
+      0,
+      -27,
+      isCongrats
+        ? '¡Begitxo ha llegado a la heladería!\nEl verano ya sabe un poco mejor.'
+        : 'El calor ha podido con Begitxo.\nToma aire y vuelve a intentarlo.',
+      {
+        fontFamily: 'monospace',
+        fontSize: '19px',
+        color: '#28172d',
+        align: 'center',
+        lineSpacing: 7
+      }
+    ).setOrigin(0.5);
+    const score = this.add.text(0, 47, `PUNTOS  ${this.score}`, {
+      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontSize: '21px',
+      color: isCongrats ? '#167f9e' : '#c64036'
+    }).setOrigin(0.5);
+    const retryText = this.add.text(0, 122, 'PULSA ENTER PARA REINTENTAR', {
+      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontSize: '20px',
+      color: '#28172d'
+    }).setOrigin(0.5);
+
+    popup.add([shadow, panel, ribbon, eyebrow, title, message, score, retryText]);
+    this.tweens.add({
+      targets: popup,
+      scaleX: 1,
+      scaleY: 1,
+      alpha: 1,
+      duration: 260,
+      ease: 'Back.Out'
+    });
+    this.tweens.add({
+      targets: retryText,
+      alpha: 0.38,
+      duration: 720,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.InOut'
+    });
+
+    this.input.keyboard.once('keydown-ENTER', () => this.scene.restart());
   }
 
   deactivateBullet(bullet) {
