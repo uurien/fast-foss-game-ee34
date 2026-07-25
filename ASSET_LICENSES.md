@@ -29,7 +29,7 @@ aportación propia y cualquier derecho que pueda ostentar sobre esos resultados.
 | Recurso | Fichero |
 | --- | --- |
 | Protagonista, seis poses | `public/assets/begitxo-poses-6-green.png` |
-| Jefe Eguzkitzarra, concepto y animación | `public/assets/eguzkitzarra-boss-concept-v3.png`, `public/assets/eguzkitzarra-boss-6x512.png` |
+| Jefe Eguzkitzarra, animación | `public/assets/eguzkitzarra-boss-6x512.png` |
 | Columnas y tornado de fuego | `public/assets/boss-fire-columns-6x341.png`, `public/assets/fire-tornado-spin-6x64.png` |
 | Salida de aire caliente | `public/assets/hazards/hot-air-vent-wide-6x192.png` |
 | Indicadores de salud | `public/assets/health-bar-clean.png`, `public/assets/health-bar-burned.png` |
