@@ -33,7 +33,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.createHeatWaveAnimation();
     this.createHotAirVentAnimation();
     this.generatePlaceholderTextures();
-    this.scene.start('Game');
+    this.scene.start('Title');
   }
 
   createHeatWaveAnimation() {
