@@ -7,45 +7,29 @@ pistola de agua y trata de llegar a la heladería.
 El juego funciona completamente en local: no descarga código, fuentes ni
 recursos durante la ejecución.
 
-## Ejecutar en GNU/Linux
+Vídeo de la partida: [`begitxo-izozki-bila.mp4`](begitxo-izozki-bila.mp4).
 
-Paquetes necesarios de la distribución:
+## Ejecutar
 
-- `nodejs` 22 o posterior y `npm`, solo para instalar y generar la build.
-- `chromium`, en su versión más reciente disponible, para jugar y probar.
+Requisitos: `nodejs` 22 o posterior, `npm` y `chromium` para jugar.
 
-Instala ambos con el gestor de paquetes de tu distribución y comprueba la
-versión de Node antes de continuar:
-
-```bash
-node --version
-```
-
-Con las dependencias instaladas:
-
-```bash
-npm ci
-npm run check:compliance
-npm run build
-npm run test:chromium
-npm run dev -- --host 127.0.0.1
-```
-
-Abre `http://127.0.0.1:5173` en Chromium. No abras `index.html` directamente
-con `file://`, porque los módulos de JavaScript deben servirse por HTTP.
-
-Para producir la entrega estática reproducible:
+Para desarrollo:
 
 ```bash
 npm install
-npm run check:compliance
+npm run dev
+```
+
+Para producción:
+
+```bash
+npm install
 npm run build
-npm run test:chromium
-npm run preview -- --host 127.0.0.1
+npm run preview
 ```
 
 La entrega queda en `dist/` y puede alojarse en cualquier servidor web
-estático. `npm ci` respeta exactamente las versiones de `package-lock.json`.
+estático.
 
 ## Controles
 
@@ -110,7 +94,7 @@ autorización o cláusula de las bases que permita este uso y su redistribución
 
 | Norma | Evidencia en el proyecto |
 | --- | --- |
-| Utilizable en GNU/Linux | HTML5 sin binarios propios; build CI en `ubuntu-latest`; instrucciones anteriores con paquetes de distribución. |
+| Utilizable en GNU/Linux | HTML5 sin binarios propios; build CI en `ubuntu-latest`. |
 | Solo software libre | Inventario completo de dependencias y licencias en este README; auditoría automática del lockfile. |
 | Resultado bajo licencia OSI | Código y arte original bajo MIT; avisos MIT/ISC/BSD compatibles incluidos. Queda sujeta a la autorización de Begitxo indicada arriba. |
 | Dependencias documentadas | Tablas anteriores y `package-lock.json`; versiones directas fijadas sin rangos. |
