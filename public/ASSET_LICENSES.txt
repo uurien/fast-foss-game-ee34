@@ -1,0 +1,28 @@
+ASSET LICENSE AND PROVENANCE
+============================
+
+Except where stated below, every PNG distributed in assets/ was created or
+generated specifically for this game by the participant, with the participant's
+own manual or programmatic post-processing. No third-party stock images,
+photographs, audio, fonts or downloaded logos are included.
+
+Copyright (c) 2026 Ugaitz Urien. These original resources are offered under the
+MIT License in LICENSE.txt, to the extent copyright applies to each result.
+
+The illustrations and variants were made with AI-assisted image-generation
+tools, then cropped, composed, scaled, animated or cleaned for use in the game.
+Those tools are not needed to install, build or run the result.
+
+The distributed inventory comprises the Begitxo pose sheet, the Eguzkitzarra
+concept and animation, fire columns and tornado, hot-air vent, health bars, ice
+cream shop, crate, container and every city-parallax PNG under assets/.
+
+BEGITXO RIGHTS
+--------------
+
+Begitxo is a pre-existing Euskal Encounter character and the theme of the game.
+The MIT grant covers only the participant's original expression; it does not
+claim ownership of the underlying character, name or marks. Complete MIT
+redistribution therefore also requires the organizer's permission for use and
+redistribution of Begitxo. If that permission is not OSI-compatible, the
+character and its name must be replaced with a wholly original creation.

@@ -60,9 +60,9 @@ export default class TitleScene extends Phaser.Scene {
   drawTitle() {
     this.add
       .text(GAME_WIDTH / 2, 65, 'BEGITXO IZOZKI BILA', {
-        fontFamily: 'Arial Black, Impact, sans-serif',
+        fontFamily: 'sans-serif',
         fontSize: '61px',
-        fontStyle: '900',
+        fontStyle: 'bold',
         color: '#fff2ce',
         stroke: '#28172d',
         strokeThickness: 12,
@@ -78,8 +78,9 @@ export default class TitleScene extends Phaser.Scene {
     const face = this.add.rectangle(0, 0, 270, 72, COLORS.coral).setOrigin(0.5).setStrokeStyle(4, COLORS.cream);
     const label = this.add
       .text(0, -1, 'EMPEZAR', {
-        fontFamily: 'Arial Black, Impact, sans-serif',
+        fontFamily: 'sans-serif',
         fontSize: '30px',
+        fontStyle: 'bold',
         color: '#fff2ce'
       })
       .setOrigin(0.5);

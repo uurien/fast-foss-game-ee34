@@ -1,16 +1,16 @@
-# Assets
+# Recursos distribuidos
 
-Pon aqui el arte definitivo (sprites, tilesets, audio) cuando este listo.
+Esta carpeta contiene exclusivamente los PNG que Vite copia a `dist/assets/` y
+que el juego carga en Chromium. No se descargan recursos durante la ejecución.
 
-Para usarlo, cargalo en `src/scenes/PreloadScene.js` dentro de `preload()`, por ejemplo:
+La autoría, procedencia, inventario y licencia se documentan en
+[`../ASSET_LICENSES.txt`](../ASSET_LICENSES.txt). Todos los recursos originales
+del participante se ofrecen bajo MIT junto con el código.
 
-```js
-this.load.spritesheet('begitxo', 'assets/begitxo.png', { frameWidth: 32, frameHeight: 48 });
-this.load.image('platform', 'assets/platform.png');
-this.load.audio('shoot', 'assets/shoot.ogg');
-```
+Al añadir un recurso:
 
-Y sustituye las texturas generadas por codigo en `generatePlaceholderTextures()`
-por las claves de estos assets reales.
-
-Recuerda usar solo recursos FOSS / con licencia libre acorde al espiritu del jam.
+1. conserva su fuente o proceso en `assets/`;
+2. registra su procedencia y licencia en `ASSET_LICENSES.md`;
+3. usa solo formatos implementados por Chromium con software libre;
+4. ejecuta `npm run check:compliance` para comprobar que toda ruta cargada
+   existe y que no se ha introducido una dependencia remota.

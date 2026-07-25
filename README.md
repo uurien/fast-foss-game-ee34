@@ -1,75 +1,130 @@
-# Begitxo - Run & Gun (Fast FOSS Game, Euskal Encounter 34)
+# Begitxo izozki bila
 
-Base de proyecto con [Phaser 3](https://phaser.io/) + [Vite](https://vitejs.dev/) para un
-Run and Gun con plataformas, siguiendo la tematica de la Euskal Encounter 34: en plena ola
-de calor, Begitxo sale de casa a buscar como refrescarse y tiene que defenderse de los
-enemigos que se encuentra por el camino.
+Juego HTML5 para la competición **Fast FOSS Game de Euskal Encounter 34**. En
+plena ola de calor, Begitxo cruza la ciudad, combate a Eguzkitzarra con su
+pistola de agua y trata de llegar a la heladería.
 
-## Requisitos
+El juego funciona completamente en local: no descarga código, fuentes ni
+recursos durante la ejecución.
 
-- Node.js 18+
+## Ejecutar en GNU/Linux
 
-## Poner en marcha
+Paquetes necesarios de la distribución:
 
-```bash
-npm install
-npm run dev
-```
+- `nodejs` 18 o posterior y `npm`, solo para instalar y generar la build.
+- `chromium`, en su versión más reciente disponible, para jugar y probar.
 
-Abre la URL que muestra Vite (por defecto http://localhost:5173).
-
-Para generar una build estatica (por ejemplo para subir a itch.io):
+En Arch Linux, por ejemplo:
 
 ```bash
+sudo pacman -S nodejs npm chromium
+npm ci
+npm run check:compliance
 npm run build
+npm run test:chromium
+npm run dev -- --host 127.0.0.1
 ```
 
-Los ficheros quedan en `dist/`.
+Abre `http://127.0.0.1:5173` en Chromium. No abras `index.html` directamente
+con `file://`, porque los módulos de JavaScript deben servirse por HTTP.
+
+Para producir la entrega estática reproducible:
+
+```bash
+npm ci
+npm run check:compliance
+npm run build
+npm run test:chromium
+npm run preview -- --host 127.0.0.1
+```
+
+La entrega queda en `dist/` y puede alojarse en cualquier servidor web
+estático. `npm ci` respeta exactamente las versiones de `package-lock.json`.
 
 ## Controles
 
-- Mover: flechas / `A` `D`
-- Saltar: flecha arriba / `W` / `Espacio`
-- Disparar: `X` / clic izquierdo
+- Mover: flechas izquierda/derecha o `A`/`D`.
+- Saltar: flecha arriba o `W`.
+- Disparar: `Espacio`, `X` o clic/botón principal.
+- Empezar o reintentar: `Enter`.
 
-## Estado actual
+## Dependencias y licencias
 
-Esta es la base jugable minima:
+Todas las dependencias directas y transitivas fijadas por el lockfile son
+software libre. No se usan CDN, telemetría, servicios web ni fuentes externas.
 
-- Escenas: `Boot` -> `Preload` -> `Game`.
-- Fisicas Arcade con gravedad, colisiones jugador/enemigos con plataformas.
-- Jugador: correr, saltar y disparar balas en la direccion en la que mira.
-- Enemigos con patrulla simple entre dos puntos, con vida y muerte al recibir impactos.
-- Nivel de ejemplo con suelo y plataformas flotantes, camara que sigue al jugador.
-- HUD basico de vida y puntuacion.
-- Todas las texturas (jugador, enemigo, bala, plataforma) se generan por codigo
-  en `PreloadScene` (rectangulos de color) para poder jugar sin arte definitivo.
+| Uso | Dependencia fijada | Licencia |
+| --- | --- | --- |
+| Juego | Phaser 3.90.0 | MIT |
+| Transitiva de Phaser | eventemitter3 5.0.4 | MIT |
+| Build/desarrollo | Vite 5.4.21 | MIT |
+| Transitiva de Vite | esbuild y binarios opcionales `@esbuild/*` 0.21.5 | MIT |
+| Transitiva de Vite | Rollup y binarios opcionales `@rollup/*` 4.62.2 | MIT |
+| Transitiva de Rollup | `@types/estree` 1.0.9 | MIT |
+| Opcional de Rollup en macOS | fsevents 2.3.3 | MIT |
+| Transitiva de Vite | postcss 8.5.22 | MIT |
+| Transitiva de postcss | nanoid 3.3.16 | MIT |
+| Transitiva de postcss | picocolors 1.1.1 | ISC |
+| Transitiva de postcss | source-map-js 1.2.1 | BSD-3-Clause |
+
+Dependencias del entorno que no se incluyen en la entrega:
+
+| Uso | Herramienta | Licencia |
+| --- | --- | --- |
+| Build | Node.js 18+ | MIT |
+| Instalación | npm CLI | Artistic-2.0 |
+| Ejecución/pruebas | Chromium | BSD-3-Clause y licencias libres compatibles |
+| Edición opcional de fuentes gráficas | PowerShell y .NET/System.Drawing | MIT |
+
+Los scripts PowerShell son herramientas auxiliares históricas para procesar
+PNG; no intervienen en `npm ci`, en la build ni en la ejecución del juego. Las
+acciones opcionales de despliegue (`actions/checkout@v4`,
+`actions/setup-node@v4`, `actions/upload-pages-artifact@v3` y
+`actions/deploy-pages@v4`) también están publicadas bajo MIT.
+
+Los avisos que deben acompañar a la build están en
+[`public/THIRD_PARTY_NOTICES.txt`](public/THIRD_PARTY_NOTICES.txt). El lockfile
+es el inventario exhaustivo y verificable de paquetes.
+
+## Licencia y recursos
+
+El código y los recursos originales del proyecto se ofrecen bajo la licencia
+OSI **MIT** del fichero [`LICENSE`](LICENSE). La procedencia, inventario y
+tratamiento de los recursos generados con IA se documentan en
+[`ASSET_LICENSES.md`](ASSET_LICENSES.md). Las texturas sencillas de enemigos,
+proyectiles y suelo se generan con código MIT durante la carga.
+
+Begitxo es un personaje de Euskal Encounter. La licencia MIT del participante
+cubre su código, animación y arte original, pero no puede sustituir una
+autorización de la organización sobre el personaje preexistente. Para una
+entrega íntegramente relicenciable, se debe conservar junto a la entrega la
+autorización o cláusula de las bases que permita este uso y su redistribución.
+
+## Comprobación de las normas Fast FOSS Game
+
+| Norma | Evidencia en el proyecto |
+| --- | --- |
+| Utilizable en GNU/Linux | HTML5 sin binarios propios; build CI en `ubuntu-latest`; instrucciones anteriores con paquetes de distribución. |
+| Solo software libre | Inventario completo de dependencias y licencias en este README; auditoría automática del lockfile. |
+| Resultado bajo licencia OSI | Código y arte original bajo MIT; avisos MIT/ISC/BSD compatibles incluidos. Queda sujeta a la autorización de Begitxo indicada arriba. |
+| Dependencias documentadas | Tablas anteriores y `package-lock.json`; versiones directas fijadas sin rangos. |
+| HTML5 en Chromium | Phaser Canvas/WebGL, recursos locales y prueba indicada con el Chromium de la distribución. |
+| Generación con LLM licenciable | Procedencia declarada y resultados originales publicados bajo MIT en `ASSET_LICENSES.md`. |
+
+`npm run check:compliance` falla si aparece una licencia npm no aprobada, falta
+un asset cargado, se introduce una URL remota o se vuelve a depender de las
+fuentes propietarias que se eliminaron de la interfaz. `npm run test:chromium`
+arranca `dist/` en el Chromium instalado por la distribución y comprueba que el
+juego llega a crear su canvas sin errores de carga o JavaScript. La CI repite la
+prueba dentro de Arch Linux con `nodejs`, `npm` y `chromium` de su repositorio
+oficial antes de permitir el despliegue.
 
 ## Estructura
 
+```text
+src/                 Código del juego y escenas Phaser
+public/assets/       Recursos que se copian a la build
+assets/              Fuentes e intermedios gráficos editables
+scripts/             Herramientas de procesado y auditoría
+dist/                Build generada (no versionada)
 ```
-src/
-  main.js                 Configuracion de Phaser.Game y lista de escenas
-  config.js               Constantes del juego (tamanos, velocidades, vida...)
-  scenes/
-    BootScene.js
-    PreloadScene.js        Genera texturas placeholder / cargara assets reales
-    GameScene.js           Logica principal del nivel
-  entities/
-    Player.js
-    Enemy.js
-    Platforms.js           Construccion del nivel y puntos de spawn de enemigos
-public/
-  assets/                  Arte y audio definitivos (ver assets/README.md)
-```
-
-## Siguientes pasos sugeridos
-
-- Sustituir las texturas generadas por sprites/animaciones reales en `public/assets`
-  (ver `public/assets/README.md`).
-- Anadir animaciones (idle, correr, saltar, disparar, morir) con `this.anims.create`.
-- Cargar el nivel desde un tilemap hecho con [Tiled](https://www.mapeditor.org/) en vez
-  del nivel generado a mano en `Platforms.js`.
-- Anadir sonido (disparos, impactos, musica).
-- Anadir una pantalla de menu/game over y transicion entre niveles.
-- Variedad de enemigos (a distancia, voladores, jefes) y power-ups (vida, munición especial).

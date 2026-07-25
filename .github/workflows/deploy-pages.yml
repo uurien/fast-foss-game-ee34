@@ -15,6 +15,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  linux-chromium:
+    runs-on: ubuntu-latest
+    container: archlinux:base
+    steps:
+      - name: Install Arch Linux repository dependencies
+        run: pacman -Syu --noconfirm --needed git nodejs npm chromium
+
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+      - run: npm run check:compliance
+      - run: npm run build
+      - run: npm run test:chromium
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -33,7 +47,7 @@ jobs:
           path: dist
 
   deploy:
-    needs: build
+    needs: [linux-chromium, build]
     runs-on: ubuntu-latest
     environment:
       name: github-pages

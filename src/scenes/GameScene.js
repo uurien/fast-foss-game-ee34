@@ -481,8 +481,9 @@ export default class GameScene extends Phaser.Scene {
       letterSpacing: 2
     }).setOrigin(0.5);
     const title = this.add.text(0, -128, isCongrats ? 'ZORIONAK!' : 'GAME OVER', {
-      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontFamily: 'sans-serif',
       fontSize: isCongrats ? '48px' : '50px',
+      fontStyle: 'bold',
       color: '#fff2ce',
       stroke: '#28172d',
       strokeThickness: 8,
@@ -503,13 +504,15 @@ export default class GameScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
     const score = this.add.text(0, 47, `PUNTOS  ${this.score}`, {
-      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontFamily: 'sans-serif',
       fontSize: '21px',
+      fontStyle: 'bold',
       color: isCongrats ? '#167f9e' : '#c64036'
     }).setOrigin(0.5);
     const retryText = this.add.text(0, 122, 'PULSA ENTER PARA REINTENTAR', {
-      fontFamily: 'Arial Black, Impact, sans-serif',
+      fontFamily: 'sans-serif',
       fontSize: '20px',
+      fontStyle: 'bold',
       color: '#28172d'
     }).setOrigin(0.5);
 
