@@ -11,13 +11,19 @@ recursos durante la ejecución.
 
 Paquetes necesarios de la distribución:
 
-- `nodejs` 18 o posterior y `npm`, solo para instalar y generar la build.
+- `nodejs` 22 o posterior y `npm`, solo para instalar y generar la build.
 - `chromium`, en su versión más reciente disponible, para jugar y probar.
 
-En Arch Linux, por ejemplo:
+Instala ambos con el gestor de paquetes de tu distribución y comprueba la
+versión de Node antes de continuar:
 
 ```bash
-sudo pacman -S nodejs npm chromium
+node --version
+```
+
+Con las dependencias instaladas:
+
+```bash
 npm ci
 npm run check:compliance
 npm run build
@@ -31,7 +37,7 @@ con `file://`, porque los módulos de JavaScript deben servirse por HTTP.
 Para producir la entrega estática reproducible:
 
 ```bash
-npm ci
+npm install
 npm run check:compliance
 npm run build
 npm run test:chromium
