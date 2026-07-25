@@ -41,7 +41,7 @@ export default class GameScene extends Phaser.Scene {
       allowGravity: false
     });
 
-    this.player = new Player(this, 5500, GAME_HEIGHT - 150, this.bullets);
+    this.player = new Player(this, 100, GAME_HEIGHT - 150, this.bullets);
     this.player.setDepth(2);
 
     this.enemies = this.physics.add.group();
