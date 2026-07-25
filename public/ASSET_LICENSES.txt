@@ -14,8 +14,9 @@ tools, then cropped, composed, scaled, animated or cleaned for use in the game.
 Those tools are not needed to install, build or run the result.
 
 The distributed inventory comprises the Begitxo pose sheet, the Eguzkitzarra
-concept and animation, fire columns and tornado, hot-air vent, health bars, ice
-cream shop, crate, container and every city-parallax PNG under assets/.
+concept and animation, fire columns and tornado, hot-air vent, health bars,
+water gun, ice cream shop, crate, container and every city-parallax PNG under
+assets/.
 
 BEGITXO RIGHTS
 --------------

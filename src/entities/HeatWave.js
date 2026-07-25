@@ -16,7 +16,11 @@ export default class HeatWave extends Enemy {
 
     // El cuerpo sigue la zona central y termina junto a la punta visible.
     // Así el tornado descansa sobre el asfalto sin quedar incrustado.
-    this.body.setCircle(20, 12, 10);
+    // Rectangulo en vez de circulo: con escala no uniforme (1x1.35) un body
+    // circular usa solo halfWidth como radio efectivo en la comprobacion
+    // circulo-vs-rectangulo, ignorando el estiramiento vertical.
+    this.body.setSize(40, 40, false);
+    this.body.setOffset(12, 10);
 
     // Solido: Begitxo no puede atravesarlo, tiene que rodearlo o saltarlo.
     // Al ser inamovible, el choque no afecta a la patrulla del tornado.

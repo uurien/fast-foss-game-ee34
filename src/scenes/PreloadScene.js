@@ -19,6 +19,7 @@ export default class PreloadScene extends Phaser.Scene {
     });
     this.load.image('health-bar-clean', 'assets/health-bar-clean.png');
     this.load.image('health-bar-burned', 'assets/health-bar-burned.png');
+    this.load.image('water-gun', 'assets/weapons/water-gun-02.png');
     this.load.image('heladeria', 'assets/heladeria-begitxo.png');
     this.load.spritesheet('eguzkitzarra', 'assets/eguzkitzarra-boss-6x512.png', {
       frameWidth: 512,

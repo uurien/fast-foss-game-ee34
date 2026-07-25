@@ -28,6 +28,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.facing = 1;
     this.invulnerableUntil = 0;
     this.nextShotAt = 0;
+    this.waterGun = scene.add
+      .image(x, y, 'water-gun')
+      .setDisplaySize(32, 25)
+      .setDepth(3)
+      .setVisible(false);
+    this.waterGunHideTimer = null;
     // Multiplicador de velocidad; las zonas de calor lo bajan mientras se
     // pisan (ver GameScene.updateHeatZones). Se recalcula cada frame, no hace
     // falta restaurarlo aqui salvo el valor inicial.
@@ -97,6 +103,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.nextShotAt = time + FIRE_COOLDOWN_MS;
     }
 
+    if (this.waterGun.visible) this.updateWaterGunTransform();
+
     if (!this.body.blocked.down) {
       this.play('begitxo-jump', true);
     } else if (left || right) {
@@ -109,9 +117,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   shoot() {
     if (!this.bullets) return;
 
-    const offsetX = this.facing === 1 ? this.displayWidth * 0.35 : -this.displayWidth * 0.35;
-    const spawnX = this.x + offsetX;
-    const spawnY = this.y - this.displayHeight * 0.1;
+    this.showWaterGun();
+    const spawnX = this.waterGun.x + this.facing * (this.waterGun.displayWidth * 0.48);
+    const spawnY = this.waterGun.y - this.waterGun.displayHeight * 0.05;
     const bullet = this.bullets.get(spawnX, spawnY, 'bullet');
     if (!bullet) return;
 
@@ -128,6 +136,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     // El chorro de la pistola de agua tiene alcance limitado; se recuerda el
     // origen para poder desactivarla al superar ese alcance (ver GameScene).
     bullet.spawnX = spawnX;
+  }
+
+  showWaterGun() {
+    this.updateWaterGunTransform();
+    this.waterGun.setVisible(true);
+
+    this.waterGunHideTimer?.remove(false);
+    this.waterGunHideTimer = this.scene.time.delayedCall(155, () => {
+      if (this.waterGun?.scene) this.waterGun.setVisible(false);
+    });
+  }
+
+  updateWaterGunTransform() {
+    this.waterGun
+      .setPosition(this.x + this.facing * 50, this.y - 5)
+      .setFlipX(this.facing === -1);
   }
 
   takeDamage(amount, time) {

@@ -27,7 +27,9 @@ export default class Eguzkitzarra extends Phaser.Physics.Arcade.Sprite {
     // se escala con setDisplaySize: si el orden se invierte, Arcade Physics
     // puede no recalcular el tamano del cuerpo porque no detecta un cambio
     // de escala, dejando un hitbox varias veces mayor que el sprite visible.
-    this.body.setCircle(135, 55, 38);
+    // Radio y offset ajustados para inscribir la bola de placas (sin las
+    // puntas de llama ni el engranaje, que sobresalen del cuerpo solido).
+    this.body.setCircle(148, 87, 87);
     // El personaje ocupa aproximadamente el 75% de cada celda; este tamano
     // compensa el padding del spritesheet y conserva su escala visual previa.
     this.setDisplaySize(300, 295);

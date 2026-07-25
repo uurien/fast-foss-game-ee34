@@ -16,7 +16,13 @@ export default class FireStorm extends Phaser.Physics.Arcade.Sprite {
     this.setScale(1.18, 1.55);
     this.setDepth(3);
     this.play('heatwave-spin');
-    this.body.setCircle(20, 12, 10);
+    // El estirado no uniforme (1.18x1.55) rompe un body circular: Arcade
+    // solo usa halfWidth como radio efectivo en la comprobacion circulo-vs-
+    // rectangulo, así que ignora el estiramiento vertical y los disparos que
+    // tocan la parte alta/baja del tornado no se detectan. Un rectangulo usa
+    // ambos ejes correctamente.
+    this.body.setSize(40, 40, false);
+    this.body.setOffset(12, 10);
     const launchVelocityX = Phaser.Math.Clamp(targetX - x, -420, -120);
     this.setVelocity(launchVelocityX, -300);
   }

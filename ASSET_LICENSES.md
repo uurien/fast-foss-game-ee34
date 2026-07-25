@@ -33,6 +33,7 @@ aportación propia y cualquier derecho que pueda ostentar sobre esos resultados.
 | Columnas y tornado de fuego | `public/assets/boss-fire-columns-6x341.png`, `public/assets/fire-tornado-spin-6x64.png` |
 | Salida de aire caliente | `public/assets/hazards/hot-air-vent-wide-6x192.png` |
 | Indicadores de salud | `public/assets/health-bar-clean.png`, `public/assets/health-bar-burned.png` |
+| Pistola de agua | `public/assets/weapons/water-gun-02.png` |
 | Meta/heladería | `public/assets/heladeria-begitxo.png` |
 | Obstáculos | `public/assets/obstacles/crate-03.png`, `public/assets/obstacles/container-04-large.png` |
 | Ciudad en parallax | todos los PNG de `public/assets/city-parallax/` |
@@ -43,7 +44,7 @@ Las texturas de enemigo básico, proyectil y suelo se dibujan en
 ## Fuentes e intermedios no cargados por el juego
 
 Los PNG de `assets/begitxo-*`, `assets/city-parallax/sources/`,
-`assets/goals/` y `assets/hazards/` documentan el proceso y tienen la misma
+`assets/goals/`, `assets/hazards/` y `assets/weapons/` documentan el proceso y tienen la misma
 autoría y licencia que sus versiones distribuidas. No son dependencias de la
 build.
 
