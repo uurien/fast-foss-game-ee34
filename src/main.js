@@ -21,7 +21,10 @@ const config = {
   },
   scale: {
     mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT,
+    parent: 'app'
   },
   scene: [BootScene, PreloadScene, TitleScene, GameScene]
 };
