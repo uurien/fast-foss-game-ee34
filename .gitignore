@@ -143,3 +143,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 .claude
+
+# Generated image intermediates (final game assets live in public/assets)
+tmp/imagegen/

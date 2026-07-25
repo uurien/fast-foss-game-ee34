@@ -3,7 +3,7 @@ export const GAME_HEIGHT = 540;
 export const LEVEL_WIDTH = 7200;
 
 export const PLAYER_SPEED = 220;
-export const JUMP_VELOCITY = -440;
+export const JUMP_VELOCITY = -500;
 export const GRAVITY_Y = 900;
 
 export const FIRE_COOLDOWN_MS = 220;
