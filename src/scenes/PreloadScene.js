@@ -20,6 +20,8 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('health-bar-clean', 'assets/health-bar-clean.png');
     this.load.image('health-bar-burned', 'assets/health-bar-burned.png');
     this.load.image('heladeria', 'assets/heladeria-begitxo.png');
+    this.load.image('obstacle-crate', 'assets/obstacles/crate-01.png');
+    this.load.image('obstacle-container', 'assets/obstacles/container-04-large.png');
     this.load.spritesheet('heatwave', 'assets/fire-tornado-spin-6x64.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -110,21 +112,6 @@ export default class PreloadScene extends Phaser.Scene {
     g.fillStyle(0x1976d2, 1);
     g.fillRect(0, 0, 12, 6);
     g.generateTexture('bullet', 12, 6);
-    g.clear();
-
-    // Baldosa urbana: bordillo de hormigon sobre asfalto oscuro. Se usa
-    // tanto en el suelo como en las plataformas hasta tener un tileset
-    // dedicado para cada tipo de superficie.
-    g.fillStyle(0x3b3a42, 1);
-    g.fillRect(0, 0, 64, 32);
-    g.fillStyle(0x77717a, 1);
-    g.fillRect(0, 0, 64, 8);
-    g.fillStyle(0x57535d, 1);
-    g.fillRect(0, 8, 64, 3);
-    g.lineStyle(2, 0x24242a, 1);
-    g.strokeRect(1, 1, 62, 30);
-    g.lineBetween(32, 1, 32, 9);
-    g.generateTexture('platform', 64, 32);
     g.clear();
 
     // Suelo continuo de la calle. Esta textura se repite en todas las

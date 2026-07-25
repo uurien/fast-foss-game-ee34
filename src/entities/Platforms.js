@@ -3,7 +3,7 @@ import { LEVEL_WIDTH, GAME_HEIGHT } from '../config.js';
 const TILE_W = 64;
 const TILE_H = 32;
 
-// Construye el suelo, plataformas flotantes, puntos de aparicion de
+// Construye el suelo, obstaculos urbanos, puntos de aparicion de
 // enemigos, zonas de calor y el objetivo final (la heladeria). Es el
 // primer nivel, pensado para editarse a mano o sustituirse por un tilemap
 // de Tiled mas adelante.
@@ -18,54 +18,59 @@ export function buildLevel(scene) {
     platforms.create(x + TILE_W / 2, groundY, 'street-ground');
   }
 
-  // Plataformas flotantes a lo largo de todo el nivel, alternando altura
-  // para que el salto no se vuelva repetitivo. Los ultimos tramos (a partir
-  // de floater16) quedan libres a proposito: es la recta final, sin
-  // obstaculos, para llegar tranquilo a la heladeria.
-  const floaters = [
-    { x: 300, y: 380, tiles: 3 },
-    { x: 700, y: 340, tiles: 3 },
-    { x: 1100, y: 440, tiles: 4 },
-    { x: 1500, y: 320, tiles: 3 },
-    { x: 1900, y: 380, tiles: 4 },
-    { x: 2300, y: 300, tiles: 3 },
-    { x: 2700, y: 420, tiles: 4 },
-    { x: 3100, y: 340, tiles: 3 },
-    { x: 3550, y: 400, tiles: 4 },
-    { x: 3950, y: 280, tiles: 3 },
-    { x: 4350, y: 380, tiles: 4 },
-    { x: 4750, y: 320, tiles: 3 },
-    { x: 5150, y: 420, tiles: 4 },
-    { x: 5550, y: 340, tiles: 3 },
-    { x: 5950, y: 400, tiles: 4 },
-    { x: 6350, y: 300, tiles: 3 }
+  // Las antiguas plataformas flotantes se sustituyen por cajas y
+  // contenedores apoyados directamente sobre el asfalto. El contenedor es
+  // deliberadamente mas grande para alternar dos ritmos de salto. La recta
+  // final sigue limpia para que la llegada a la heladeria respire.
+  const obstacles = [
+    { x: 300, key: 'obstacle-crate' },
+    { x: 700, key: 'obstacle-container' },
+    { x: 1100, key: 'obstacle-crate' },
+    { x: 1500, key: 'obstacle-container' },
+    { x: 1900, key: 'obstacle-crate' },
+    { x: 2300, key: 'obstacle-container' },
+    { x: 2700, key: 'obstacle-crate' },
+    { x: 3100, key: 'obstacle-container' },
+    { x: 3550, key: 'obstacle-crate' },
+    { x: 3950, key: 'obstacle-container' },
+    { x: 4350, key: 'obstacle-crate' },
+    { x: 4750, key: 'obstacle-container' },
+    { x: 5150, key: 'obstacle-crate' },
+    { x: 5550, key: 'obstacle-container' },
+    { x: 5950, key: 'obstacle-crate' },
+    { x: 6350, key: 'obstacle-container' }
   ];
 
-  floaters.forEach((f) => {
-    for (let i = 0; i < f.tiles; i += 1) {
-      platforms.create(f.x + i * TILE_W, f.y, 'platform');
-    }
+  const streetTopY = GAME_HEIGHT - TILE_H;
+  obstacles.forEach(({ x, key }) => {
+    const isContainer = key === 'obstacle-container';
+    const width = isContainer ? 176 : 82;
+    const height = isContainer ? 104 : 84;
+    platforms
+      .create(x, streetTopY - height / 2, key)
+      .setDisplaySize(width, height)
+      .refreshBody();
   });
 
-  // Enemigos: alternan patrullas por el suelo (rango amplio) y patrullas
-  // sobre una plataforma flotante concreta (rango ajustado al ancho de esa
-  // plataforma, con medio bloque de margen). La velocidad crece poco a poco
-  // segun se avanza para que el nivel gane dificultad de forma progresiva.
+  // Todos los tornados patrullan a ras de suelo. Conservan recorridos de
+  // distinta longitud y aumentan su velocidad poco a poco para que el nivel
+  // gane dificultad sin volver a introducir enemigos flotantes.
+  const tornadoGroundY = groundY - 60;
   const enemySpawns = [
-    { x: 500, y: groundY - 60, minX: 420, maxX: 620, speed: 55 },
-    { x: 750, y: 284, minX: 700, maxX: 828, speed: 50 },
-    { x: 1180, y: 384, minX: 1100, maxX: 1292, speed: 60 },
-    { x: 1550, y: 264, minX: 1500, maxX: 1628, speed: 60 },
-    { x: 2000, y: groundY - 60, minX: 1900, maxX: 2150, speed: 70 },
-    { x: 2350, y: 244, minX: 2300, maxX: 2428, speed: 65 },
-    { x: 2750, y: 364, minX: 2700, maxX: 2892, speed: 75 },
-    { x: 3350, y: groundY - 60, minX: 3230, maxX: 3550, speed: 80 },
-    { x: 4000, y: 224, minX: 3950, maxX: 4078, speed: 80 },
-    { x: 4400, y: 324, minX: 4350, maxX: 4542, speed: 85 },
-    { x: 4800, y: 264, minX: 4750, maxX: 4878, speed: 85 },
-    { x: 4950, y: groundY - 60, minX: 4900, maxX: 5100, speed: 90 },
-    { x: 5600, y: 284, minX: 5550, maxX: 5678, speed: 90 },
-    { x: 6000, y: 344, minX: 5950, maxX: 6142, speed: 95 }
+    { x: 500, y: tornadoGroundY, minX: 420, maxX: 620, speed: 55 },
+    { x: 750, y: tornadoGroundY, minX: 700, maxX: 828, speed: 50 },
+    { x: 1180, y: tornadoGroundY, minX: 1100, maxX: 1292, speed: 60 },
+    { x: 1550, y: tornadoGroundY, minX: 1500, maxX: 1628, speed: 60 },
+    { x: 2000, y: tornadoGroundY, minX: 1900, maxX: 2150, speed: 70 },
+    { x: 2350, y: tornadoGroundY, minX: 2300, maxX: 2428, speed: 65 },
+    { x: 2750, y: tornadoGroundY, minX: 2700, maxX: 2892, speed: 75 },
+    { x: 3350, y: tornadoGroundY, minX: 3230, maxX: 3550, speed: 80 },
+    { x: 4000, y: tornadoGroundY, minX: 3950, maxX: 4078, speed: 80 },
+    { x: 4400, y: tornadoGroundY, minX: 4350, maxX: 4542, speed: 85 },
+    { x: 4800, y: tornadoGroundY, minX: 4750, maxX: 4878, speed: 85 },
+    { x: 4950, y: tornadoGroundY, minX: 4900, maxX: 5100, speed: 90 },
+    { x: 5600, y: tornadoGroundY, minX: 5550, maxX: 5678, speed: 90 },
+    { x: 6000, y: tornadoGroundY, minX: 5950, maxX: 6142, speed: 95 }
   ];
 
   // Zonas de calor: tramos de suelo (asfalto derretido) que ralentizan y

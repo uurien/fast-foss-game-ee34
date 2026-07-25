@@ -57,9 +57,12 @@ export default class GameScene extends Phaser.Scene {
       (zone) => new Phaser.Geom.Rectangle(zone.x - zone.width / 2, zone.y - zone.height / 2, zone.width, zone.height)
     );
     heatZones.forEach((zone) => {
-      // Una sola rejilla continua cubre el tramo completo de la zona.
+      // Una sola rejilla continua cubre el tramo completo de la zona. En el
+      // frame, el borde superior visible empieza 10 px por encima del centro;
+      // situar el sprite 6 px sobre el centro de la baldosa deja ese borde
+      // exactamente a ras de la superficie que pisa Begitxo (y = 508).
       this.add
-        .sprite(zone.x, zone.y - 28, 'hot-air-vent')
+        .sprite(zone.x, zone.y - 6, 'hot-air-vent')
         .setDisplaySize(zone.width, 64)
         .setDepth(1)
         .play('hot-air-vent-blow');
@@ -71,8 +74,8 @@ export default class GameScene extends Phaser.Scene {
     this.goal = this.physics.add.staticImage(goal.x, goal.y, 'heladeria').setDepth(2);
 
     this.physics.add.collider(this.player, this.platforms);
-    // Los tornados flotan en un carril fijo y no necesitan apoyo fisico de
-    // las plataformas; el colisionador podia expulsarlos en las uniones.
+    // Los tornados mantienen su base fijada al asfalto y no necesitan un
+    // colisionador con el suelo, que podria expulsarlos en las uniones.
     this.physics.add.collider(this.bullets, this.platforms, (bullet) => this.deactivateBullet(bullet));
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => this.onBulletHitsEnemy(bullet, enemy));

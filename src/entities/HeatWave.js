@@ -10,12 +10,12 @@ export default class HeatWave extends Enemy {
     this.setTexture('heatwave');
     this.setScale(1, 1.35);
     this.play('heatwave-spin');
-    this.hoverY = y;
+    this.groundY = y;
     this.body.setAllowGravity(false);
     this.setVelocityY(0);
 
     // El cuerpo sigue la zona central y termina junto a la punta visible.
-    // Así el tornado descansa sobre la plataforma sin quedar incrustado.
+    // Así el tornado descansa sobre el asfalto sin quedar incrustado.
     this.body.setCircle(20, 12, 10);
 
     // Solido: Begitxo no puede atravesarlo, tiene que rodearlo o saltarlo.
@@ -27,9 +27,9 @@ export default class HeatWave extends Enemy {
     super.update();
     if (!this.active || !this.body) return;
 
-    // Mantiene el tornado en su carril aunque otra colision o paso de fisica
-    // intente desplazarlo fuera de la plataforma.
-    this.y = this.hoverY;
+    // Mantiene la base del tornado pegada al suelo aunque otra colision o
+    // paso de fisica intente desplazarlo verticalmente.
+    this.y = this.groundY;
     this.x = Phaser.Math.Clamp(this.x, this.patrolMinX, this.patrolMaxX);
     this.setVelocityY(0);
   }
