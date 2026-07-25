@@ -63,9 +63,18 @@ export function buildLevel(scene) {
   // medio sprite (32 px) entre los limites de patrulla y cualquier objeto,
   // para que nunca pase visualmente por delante de una caja o contenedor.
   const tornadoGroundY = groundY - 60;
+
+  // Un heatwave se sube encima del contenedor de x=1800: obliga a saltar
+  // sobre el para alcanzarlo o a dispararle desde el suelo. Mismo offset
+  // (-44 desde el borde superior) que usa tornadoGroundY sobre el asfalto,
+  // aplicado aqui sobre el borde superior del contenedor en vez del suelo.
+  const containerHeight = 104; // igual a la altura de 'obstacle-container' definida arriba
+  const containerTopY = streetTopY - containerHeight - 44;
+
   const enemySpawns = [
     { x: 680, y: tornadoGroundY, minX: 650, maxX: 800, speed: 55 },
     { x: 1500, y: tornadoGroundY, minX: 1500, maxX: 1630, speed: 60 },
+    { x: 1800, y: containerTopY, minX: 1760, maxX: 1840, speed: 40 },
     { x: 2350, y: tornadoGroundY, minX: 2350, maxX: 2500, speed: 65 },
     { x: 3210, y: tornadoGroundY, minX: 3210, maxX: 3380, speed: 70 },
     { x: 4100, y: tornadoGroundY, minX: 4100, maxX: 4250, speed: 75 },
