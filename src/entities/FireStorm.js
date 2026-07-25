@@ -29,8 +29,8 @@ export default class FireStorm extends Phaser.Physics.Arcade.Sprite {
     this.body.setAllowGravity(false);
     this.body.setImmovable(true);
     this.setVelocity(this.direction * this.patrolSpeed, 0);
-    this.patrolMinX = Phaser.Math.Clamp(this.x - 90, 6380, 6870);
-    this.patrolMaxX = Phaser.Math.Clamp(this.x + 90, 6380, 6870);
+    this.patrolMinX = Phaser.Math.Clamp(this.x - 90, 6040, 6900);
+    this.patrolMaxX = Phaser.Math.Clamp(this.x + 90, 6040, 6900);
   }
 
   update() {

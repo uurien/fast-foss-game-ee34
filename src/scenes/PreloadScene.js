@@ -27,11 +27,16 @@ export default class PreloadScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
+    this.load.spritesheet('boss-fire-column', 'assets/boss-fire-columns-6x341.png', {
+      frameWidth: 341,
+      frameHeight: 724
+    });
   }
 
   create() {
     this.createBegitxoSpritesheet();
     this.createHeatWaveAnimation();
+    this.createBossFireColumnAnimation();
     this.createHotAirVentAnimation();
     this.generatePlaceholderTextures();
     this.scene.start('Title');
@@ -42,6 +47,15 @@ export default class PreloadScene extends Phaser.Scene {
       key: 'heatwave-spin',
       frames: this.anims.generateFrameNumbers('heatwave', { start: 0, end: 5 }),
       frameRate: 12,
+      repeat: -1
+    });
+  }
+
+  createBossFireColumnAnimation() {
+    this.anims.create({
+      key: 'boss-fire-column-burn',
+      frames: this.anims.generateFrameNumbers('boss-fire-column', { start: 0, end: 5 }),
+      frameRate: 9,
       repeat: -1
     });
   }

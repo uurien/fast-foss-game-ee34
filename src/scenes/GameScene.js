@@ -85,28 +85,27 @@ export default class GameScene extends Phaser.Scene {
     this.goal.setVisible(false).setAlpha(0);
     this.goal.body.enable = false;
 
-    this.arenaExit = this.add
-      .rectangle(boss.arenaExitX, GAME_HEIGHT / 2, 24, GAME_HEIGHT, 0xff6b1a, 0.82)
-      .setDepth(4)
-      .setVisible(false);
-    this.physics.add.existing(this.arenaExit, true);
-    this.arenaExit.body.enable = false;
-
-    // Se cierra a la espalda del jugador al empezar el combate, para que no
-    // pueda salir corriendo de la arena y esquivar al jefe.
-    this.arenaEntrance = this.add
-      .rectangle(boss.arenaEntranceX, GAME_HEIGHT / 2, 24, GAME_HEIGHT, 0xff6b1a, 0.82)
-      .setDepth(4)
-      .setVisible(false);
-    this.physics.add.existing(this.arenaEntrance, true);
-    this.arenaEntrance.body.enable = false;
+    this.arenaColumns = this.physics.add.staticGroup();
+    [boss.arenaEntranceX, boss.arenaExitX].forEach((x) => {
+      const column = this.arenaColumns
+        // La hoja conserva 33-34 px transparentes bajo la base de la llama.
+        // Escalada a 620 px son unos 29 px: anclar el lienzo casi al borde
+        // inferior coloca el fuego visible exactamente sobre el asfalto.
+        .create(x, GAME_HEIGHT + 7, 'boss-fire-column', 0)
+        .setOrigin(0.5, 1)
+        .setDisplaySize(92, 620)
+        .setDepth(7)
+        .refreshBody()
+        .setVisible(false);
+      column.body.enable = false;
+      column.play('boss-fire-column-burn');
+    });
 
     this.physics.add.collider(this.player, this.platforms);
     // Los tornados mantienen su base fijada al asfalto y no necesitan un
     // colisionador con el suelo, que podria expulsarlos en las uniones.
     this.physics.add.collider(this.bullets, this.platforms, (bullet) => this.deactivateBullet(bullet));
-    this.physics.add.collider(this.player, this.arenaExit);
-    this.physics.add.collider(this.player, this.arenaEntrance);
+    this.physics.add.collider(this.player, this.arenaColumns);
     this.physics.add.collider(this.bossStorms, this.platforms, (storm) => storm.land());
 
     this.physics.add.overlap(this.bullets, this.enemies, (bullet, enemy) => this.onBulletHitsEnemy(bullet, enemy));
@@ -323,8 +322,10 @@ export default class GameScene extends Phaser.Scene {
   startBossFight(time) {
     this.boss.awaken(time);
     this.bossHud.setVisible(true);
-    this.arenaExit.body.enable = true;
-    this.arenaEntrance.body.enable = true;
+    this.arenaColumns.getChildren().forEach((column) => {
+      column.setVisible(true);
+      column.body.enable = true;
+    });
   }
 
   launchBossStorms(count) {
@@ -334,7 +335,7 @@ export default class GameScene extends Phaser.Scene {
 
     const offsets = launchCount === 1 ? [0] : [-120, 0, 120];
     for (let index = 0; index < launchCount; index += 1) {
-      const targetX = Phaser.Math.Clamp(this.player.x + offsets[index], 6400, 6860);
+      const targetX = Phaser.Math.Clamp(this.player.x + offsets[index], 6080, 6860);
       const storm = new FireStorm(
         this,
         this.boss.x - 45,
@@ -370,8 +371,10 @@ export default class GameScene extends Phaser.Scene {
     this.score += 100;
     this.bossDefeated = true;
     this.bossHud.setVisible(false);
-    this.arenaExit.body.enable = false;
-    this.arenaEntrance.body.enable = false;
+    this.arenaColumns.getChildren().forEach((column) => {
+      column.setVisible(false);
+      column.body.enable = false;
+    });
 
     // La recompensa se activa antes de destruir sprites o grupos. Asi una
     // eventual animacion o callback de muerte nunca puede impedir que la

@@ -43,12 +43,11 @@ export default class Eguzkitzarra extends Phaser.Physics.Arcade.Sprite {
   update(time) {
     if (!this.active || !this.awake || this.state === 'defeated') return;
 
-    // Flota por la arena incluso entre ataques. Son movimientos cortos para
-    // que siga estando al alcance de la pistola, pero obligan a apuntar y a
-    // reposicionarse en vez de disparar desde un punto fijo.
+    // Se desplaza lateralmente, manteniendo siempre la punta del tornado
+    // apoyada en el suelo en vez de flotar por encima de Begitxo.
     this.setPosition(
       this.baseX + Math.sin(time / 820) * 38,
-      this.baseY + Math.sin(time / 570) * 18
+      this.baseY
     );
 
     if (time < this.stateUntil) return;
@@ -89,7 +88,9 @@ export default class Eguzkitzarra extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(amount) {
-    if (!this.active || this.state === 'defeated') return { hit: false, died: false };
+    if (!this.active || !this.awake || this.state === 'sleeping' || this.state === 'defeated') {
+      return { hit: false, died: false };
+    }
 
     const effectiveDamage = this.state === 'vulnerable' ? amount * 2 : amount;
     this.health = Math.max(0, this.health - effectiveDamage);

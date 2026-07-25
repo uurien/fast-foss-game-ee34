@@ -1,4 +1,4 @@
-import { LEVEL_WIDTH, GAME_HEIGHT, BOSS_TRIGGER_X } from '../config.js';
+import { LEVEL_WIDTH, GAME_HEIGHT } from '../config.js';
 
 const TILE_W = 64;
 const TILE_H = 32;
@@ -95,11 +95,14 @@ export function buildLevel(scene) {
   // oscilacion podia dejar el sprite completamente fuera de pantalla aunque
   // el HUD indicase que la pelea ya habia empezado.
   const boss = {
-    x: 6580,
-    y: 320,
+    x: 6500,
+    // Queda apenas por encima del asfalto: lo bastante bajo para combatir a
+    // la altura de Begitxo, con un pequeno margen de flotacion visible.
+    y: 370,
     // Se cierra justo detras del jugador en cuanto arranca el combate, para
     // que no pueda retroceder y esquivar al jefe saliendo de la arena.
-    arenaEntranceX: BOSS_TRIGGER_X,
+    // Recupera el ancho original del ring: 940 px entre ambos muros.
+    arenaEntranceX: 6000,
     arenaExitX: 6940,
     stormGroundY: tornadoGroundY
   };

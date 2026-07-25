@@ -3,7 +3,7 @@ export const GAME_HEIGHT = 540;
 export const LEVEL_WIDTH = 7200;
 
 export const PLAYER_SPEED = 220;
-export const JUMP_VELOCITY = -640;
+export const JUMP_VELOCITY = -440;
 export const GRAVITY_Y = 900;
 
 export const FIRE_COOLDOWN_MS = 220;
@@ -27,7 +27,10 @@ export const HEAT_ZONE_DAMAGE_PER_TICK = 10;
 export const HEAT_ZONE_TICK_MS = 500;
 
 export const BOSS_MAX_HEALTH = 300;
-export const BOSS_TRIGGER_X = 6000;
+// La primera columna esta en x=6000 y mide 92 px. Con el semiancho fisico
+// de Begitxo, x=6080 garantiza que ya la ha cruzado por completo cuando se
+// cierra a su espalda.
+export const BOSS_TRIGGER_X = 6080;
 export const BOSS_TELEGRAPH_MS = 650;
 export const BOSS_VULNERABLE_MS = 1100;
 export const BOSS_ATTACK_COOLDOWN_MS = 1800;

@@ -1,7 +1,8 @@
 param(
   [Parameter(Mandatory = $true)] [string] $InputPath,
   [Parameter(Mandatory = $true)] [string] $OutputPath,
-  [int] $Padding = 4
+  [int] $Padding = 4,
+  [switch] $PreserveCanvas
 )
 
 Add-Type -AssemblyName System.Drawing
@@ -41,10 +42,10 @@ try {
 
   if ($maxX -lt 0) { throw 'No opaque subject pixels found after chroma removal.' }
 
-  $left = [Math]::Max(0, $minX - $Padding)
-  $top = [Math]::Max(0, $minY - $Padding)
-  $right = [Math]::Min($source.Width - 1, $maxX + $Padding)
-  $bottom = [Math]::Min($source.Height - 1, $maxY + $Padding)
+  $left = if ($PreserveCanvas) { 0 } else { [Math]::Max(0, $minX - $Padding) }
+  $top = if ($PreserveCanvas) { 0 } else { [Math]::Max(0, $minY - $Padding) }
+  $right = if ($PreserveCanvas) { $source.Width - 1 } else { [Math]::Min($source.Width - 1, $maxX + $Padding) }
+  $bottom = if ($PreserveCanvas) { $source.Height - 1 } else { [Math]::Min($source.Height - 1, $maxY + $Padding) }
   $cropRect = New-Object System.Drawing.Rectangle $left, $top, ($right - $left + 1), ($bottom - $top + 1)
   $cropped = $processed.Clone($cropRect, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
 
